@@ -1,0 +1,2859 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>МясоМикс CRM — Учет мини-бизнеса</title>
+
+  <!-- PWA & iPhone Safari Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="МясоМикс CRM" />
+  <meta name="theme-color" content="#0B0D12" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Встроенная SVG иконка для iPhone Home Screen и Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23FF6B4A'/%3E%3Cstop offset='100%25' stop-color='%23E11D48'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='%230B0D12'/%3E%3Crect x='28' y='28' width='456' height='456' rx='95' fill='url(%23g)' opacity='0.16'/%3E%3Ccircle cx='180' cy='190' r='36' fill='url(%23g)'/%3E%3Ccircle cx='256' cy='155' r='38' fill='url(%23g)'/%3E%3Ccircle cx='332' cy='190' r='36' fill='url(%23g)'/%3E%3Cpath d='M256 225c-64 0-112 46-112 96 0 38 30 62 66 62 20 0 34-8 46-8s26 8 46 8c36 0 66-24 66-62 0-50-48-96-112-96z' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23FF6B4A'/%3E%3Cstop offset='100%25' stop-color='%23E11D48'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' fill='%230B0D12'/%3E%3Ccircle cx='178' cy='188' r='36' fill='url(%23g)'/%3E%3Ccircle cx='256' cy='152' r='38' fill='url(%23g)'/%3E%3Ccircle cx='334' cy='188' r='36' fill='url(%23g)'/%3E%3Cpath d='M256 225c-64 0-112 46-112 96 0 38 30 62 66 62 20 0 34-8 46-8s26 8 46 8c36 0 66-24 66-62 0-50-48-96-112-96z' fill='url(%23g)'/%3E%3C/svg%3E" />
+
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+          },
+          colors: {
+            bg: '#0B0D12',
+            card: '#151924',
+            cardHover: '#1B2130',
+            coral: '#FF6B4A',
+            emeraldBrand: '#22C55E',
+            ice: '#38BDF8',
+            amberBrand: '#F59E0B',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      background-color: #0B0D12;
+      color: #F8FAFC;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+
+    /* Табличные цифры для ровных сумм и счетчиков */
+    .tnum {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Стеклянные премиальные карточки */
+    .glass-card {
+      background: rgba(21, 25, 36, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .hero-glow {
+      background:
+        radial-gradient(120% 90% at 100% 0%, rgba(255, 107, 74, 0.16) 0%, rgba(255, 107, 74, 0) 55%),
+        radial-gradient(100% 100% at 0% 100%, rgba(34, 197, 94, 0.13) 0%, rgba(34, 197, 94, 0) 55%),
+        rgba(21, 25, 36, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .freezer-glow {
+      background:
+        radial-gradient(110% 100% at 100% 0%, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0) 60%),
+        rgba(21, 25, 36, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+    }
+
+    /* Безопасные отступы для iPhone */
+    .safe-pt {
+      padding-top: calc(12px + var(--safe-top));
+    }
+    .safe-pb-nav {
+      padding-bottom: calc(10px + var(--safe-bottom));
+    }
+    .main-bottom-space {
+      padding-bottom: calc(104px + var(--safe-bottom));
+    }
+
+    /* Скрытие скроллбаров для горизонтальных чипсов */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Плавное появление iOS Bottom Sheet */
+    @keyframes sheetUp {
+      from { transform: translateY(100%); opacity: 0.6; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .animate-sheet {
+      animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .animate-fade {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    /* Стилизация инпутов даты на iOS Dark */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.7;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0B0D12] text-slate-100 selection:bg-coral/30">
+
+  <!-- Десктопный фоновый свет и центрированный мобильный контейнер -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[520px] h-[360px] rounded-full bg-[#FF6B4A]/10 blur-[110px]"></div>
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[480px] h-[280px] rounded-full bg-[#38BDF8]/8 blur-[120px]"></div>
+  </div>
+
+  <!-- Основная оболочка приложения (iPhone-first, аккуратно центрируется на десктопе) -->
+  <div id="app-shell" class="relative mx-auto w-full max-w-[480px] min-h-screen flex flex-col md:border-x md:border-white/[0.06] md:shadow-[0_0_80px_rgba(0,0,0,0.75)] bg-[#0B0D12]/95">
+
+    <!-- Верхняя фиксированная шапка -->
+    <header class="sticky top-0 z-30 safe-pt pb-3 px-4 bg-[#0B0D12]/80 backdrop-blur-xl border-b border-white/[0.06]">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#FF6B4A] to-[#E11D48] flex items-center justify-center shadow-lg shadow-[#FF6B4A]/25 shrink-0">
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="7.5" cy="9" r="2.1"/>
+              <circle cx="12" cy="6.8" r="2.2"/>
+              <circle cx="16.5" cy="9" r="2.1"/>
+              <path d="M12 11.2c-3.4 0-6 2.5-6 5.2 0 2 1.6 3.3 3.5 3.3 1.1 0 1.8-.4 2.5-.4s1.4.4 2.5.4c1.9 0 3.5-1.3 3.5-3.3 0-2.7-2.6-5.2-6-5.2z"/>
+            </svg>
+          </div>
+          <div class="truncate">
+            <h1 class="text-[16px] font-bold tracking-tight leading-tight flex items-center gap-1.5">
+              <span>МясоМикс</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/10 text-[#FF6B4A]">CRM</span>
+            </h1>
+            <p id="header-subtitle" class="text-[11px] text-slate-400 leading-tight truncate">Учет натурального корма</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Быстрый индикатор морозилки -->
+          <button onclick="openStockModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#38BDF8]/12 border border-[#38BDF8]/25 text-[#38BDF8] active:scale-95 transition">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/>
+            </svg>
+            <span id="header-freezer-count" class="text-xs font-bold tnum">0 шт</span>
+          </button>
+
+          <!-- Кнопка настроек и бэкапа -->
+          <button onclick="openSettingsModal()" aria-label="Настройки и бэкап" class="w-9 h-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Баннер демо-режима -->
+    <div id="demo-banner" class="hidden mx-4 mt-3 px-3.5 py-2.5 rounded-2xl bg-[#F59E0B]/12 border border-[#F59E0B]/30 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse shrink-0"></span>
+        <p class="text-xs text-amber-100 leading-snug">
+          <span class="font-semibold">Демо-данные</span> — посмотрите графики и прогнозы
+        </p>
+      </div>
+      <button onclick="promptStartFresh()" class="shrink-0 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl bg-[#F59E0B] text-slate-950 active:scale-95 transition">
+        Начать с чистого листа
+      </button>
+    </div>
+
+    <!-- Основной контент вкладок -->
+    <main id="main-content" class="flex-1 px-4 pt-3 main-bottom-space space-y-4 overflow-x-hidden">
+      <!-- Рендерится динамически через JS -->
+    </main>
+
+    <!-- Нижняя фиксированная iOS-навигация -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-30 bg-[#0F131D]/90 backdrop-blur-2xl border-t border-white/[0.08] px-2 pt-2 safe-pb-nav">
+      <div class="grid grid-cols-4 gap-1">
+        <button onclick="switchTab('home')" data-tab="home" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition active:scale-95">
+          <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/>
+            <rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Главная</span>
+        </button>
+
+        <button onclick="switchTab('sales')" data-tab="sales" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition active:scale-95">
+          <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Продажи</span>
+        </button>
+
+        <button onclick="switchTab('purchases')" data-tab="purchases" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition active:scale-95">
+          <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Закупки</span>
+        </button>
+
+        <button onclick="switchTab('clients')" data-tab="clients" class="nav-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl transition active:scale-95">
+          <span id="nav-radar-dot" class="hidden absolute top-1 right-6 w-2 h-2 rounded-full bg-[#F59E0B] ring-2 ring-[#0F131D]"></span>
+          <svg class="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Клиенты</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Контейнер для iOS Bottom-Sheet модалок -->
+  <div id="modal-root" class="fixed inset-0 z-50 hidden"></div>
+
+  <!-- Контейнер для Toast-уведомлений -->
+  <div id="toast-root" class="fixed top-4 left-1/2 -translate-x-1/2 z-[70] w-full max-w-[440px] px-4 pointer-events-none flex flex-col items-center gap-2"></div>
+
+  <!-- Скрытый input для импорта JSON -->
+  <input type="file" id="json-import-input" accept=".json,application/json" class="hidden" onchange="handleJsonImportFile(event)" />
+
+  <script>
+    /* =========================================================================
+       МясоМикс CRM — ПОЛНАЯ БИЗНЕС-ЛОГИКА И UI
+       Хранение: localStorage (автономная работа на iPhone / GitHub Pages)
+       ========================================================================= */
+
+    const STORAGE_KEY = 'myasomix_crm_v1';
+
+    // Состав микса (из объявления на Авито)
+    const RECIPE_INGREDIENTS = [
+      { name: 'Свиное сердце', pct: 25, note: 'таурин' },
+      { name: 'Куриные желудки', pct: 30, note: 'мышечная ткань' },
+      { name: 'Куриные шеи (мелкая рубка)', pct: 15, note: 'кальций' },
+      { name: 'Куриные головы (без клювов)', pct: 15, note: 'костная основа' },
+      { name: 'Филе индейки / курицы', pct: 5, note: 'нежное мясо' },
+      { name: 'Куриные сердца', pct: 4, note: 'витамины' },
+      { name: 'Свежая морковь', pct: 3, note: 'клетчатка ЖКТ' },
+    ];
+
+    // Глобальное состояние UI (не сохраняется в localStorage)
+    const uiState = {
+      activeTab: 'home',
+      chartPeriod: 'day', // 'day' | 'week' | 'month'
+      salesFilter: 'all', // 'all' | 'promo' | 'regular'
+      salesSearch: '',
+      clientsSort: 'radar', // 'radar' | 'volume' | 'name'
+      clientsSearch: '',
+      calcOpen: false,
+      calcMode: 'qty', // 'qty' | 'kg'
+      calcValue: 35,
+      charts: {
+        finance: null,
+        unit: null
+      }
+    };
+
+    // Основное состояние данных
+    let appData = null;
+
+    /* =========================================================================
+       УТИЛИТЫ ДАТ, ФОРМАТИРОВАНИЯ И БУФЕРА ОБМЕНА
+       ========================================================================= */
+
+    function toDateStr(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseLocalDate(str) {
+      if (!str) return new Date();
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, (m || 1) - 1, d || 1);
+    }
+
+    function todayStr() {
+      return toDateStr(new Date());
+    }
+
+    function daysAgoStr(daysAgo) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - daysAgo);
+      return toDateStr(d);
+    }
+
+    function addDaysStr(dateStr, days) {
+      const d = parseLocalDate(dateStr);
+      d.setDate(d.getDate() + days);
+      return toDateStr(d);
+    }
+
+    function diffDays(dateStrA, dateStrB) {
+      const a = parseLocalDate(dateStrA);
+      const b = parseLocalDate(dateStrB);
+      return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    function formatRub(val) {
+      const num = Math.round(Number(val) || 0);
+      return num.toLocaleString('ru-RU') + ' ₽';
+    }
+
+    function formatDateHuman(dateStr) {
+      const t = todayStr();
+      const y = daysAgoStr(1);
+      if (dateStr === t) return 'Сегодня';
+      if (dateStr === y) return 'Вчера';
+      const d = parseLocalDate(dateStr);
+      return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    }
+
+    function formatDateFull(dateStr) {
+      const d = parseLocalDate(dateStr);
+      return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function genId(prefix) {
+      return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    }
+
+    // Надежное копирование в буфер обмена (работает и на iPhone Safari, и в iframe)
+    function copyTextToClipboard(text, successMsg = 'Скопировано в буфер!') {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-9999px';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) {
+          showToast(successMsg, 'success');
+          return true;
+        }
+      } catch (e) {
+        console.warn('Copy fallback error:', e);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast(successMsg, 'success'))
+          .catch(() => showToast('Не удалось скопировать текст', 'error'));
+      } else {
+        showToast('Не удалось скопировать текст', 'error');
+      }
+      return false;
+    }
+
+    /* =========================================================================
+       TOAST-УВЕДОМЛЕНИЯ И КАСТОМНЫЙ CONFIRM (БЕЗ alert/confirm)
+       ========================================================================= */
+
+    function showToast(message, type = 'info', action = null) {
+      const root = document.getElementById('toast-root');
+      const id = genId('toast');
+      const colors = {
+        success: 'bg-[#162820]/95 border-[#22C55E]/40 text-emerald-100',
+        error: 'bg-[#2A1519]/95 border-[#FF6B4A]/40 text-rose-100',
+        warning: 'bg-[#292011]/95 border-[#F59E0B]/40 text-amber-100',
+        info: 'bg-[#181D2B]/95 border-white/15 text-slate-100'
+      };
+      const dots = {
+        success: 'bg-[#22C55E]',
+        error: 'bg-[#FF6B4A]',
+        warning: 'bg-[#F59E0B]',
+        info: 'bg-[#38BDF8]'
+      };
+
+      const el = document.createElement('div');
+      el.id = id;
+      el.className = `pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-xl text-xs font-medium animate-fade w-full ${colors[type] || colors.info}`;
+      el.innerHTML = `
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-2 h-2 rounded-full shrink-0 ${dots[type] || dots.info}"></span>
+          <span class="leading-snug">${escapeHtml(message)}</span>
+        </div>
+        ${action ? `<button id="${id}_btn" class="shrink-0 px-2.5 py-1 rounded-lg bg-white/15 text-white font-semibold hover:bg-white/25 transition">${escapeHtml(action.label)}</button>` : ''}
+      `;
+      root.appendChild(el);
+
+      if (action && action.onClick) {
+        const btn = document.getElementById(`${id}_btn`);
+        if (btn) {
+          btn.onclick = () => {
+            action.onClick();
+            el.remove();
+          };
+        }
+      }
+
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => el.remove(), 260);
+        }
+      }, action ? 4800 : 2800);
+    }
+
+    function openConfirmModal({ title, message, confirmText = 'Подтвердить', danger = false, onConfirm }) {
+      openSheetModal(`
+        <div class="p-5 space-y-4">
+          <div class="space-y-1.5">
+            <h3 class="text-lg font-bold text-white">${escapeHtml(title)}</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">${escapeHtml(message)}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <button onclick="closeModal()" class="py-3.5 rounded-2xl bg-white/[0.07] text-slate-200 text-sm font-semibold active:scale-95 transition">Отмена</button>
+            <button id="confirm-modal-ok" class="py-3.5 rounded-2xl text-sm font-bold active:scale-95 transition ${danger ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/25' : 'bg-[#FF6B4A] text-white shadow-lg shadow-[#FF6B4A]/25'}">${escapeHtml(confirmText)}</button>
+          </div>
+        </div>
+      `);
+      document.getElementById('confirm-modal-ok').onclick = () => {
+        closeModal();
+        if (onConfirm) onConfirm();
+      };
+    }
+
+    /* =========================================================================
+       ДЕМО-ДАННЫЕ И ХРАНИЛИЩЕ
+       ========================================================================= */
+
+    function createEmptyState() {
+      return {
+        isDemo: false,
+        settings: {
+          unitPrice: 210,
+          promo3Price: 550,
+          pocketPercent: 50,
+          startingFund: 0,
+          defaultDailyRate: 1
+        },
+        inventory: {
+          freezerStock: 0,
+          emptyContainers: 0,
+          catConsumed: 0
+        },
+        clients: [],
+        sales: [],
+        purchases: []
+      };
+    }
+
+    function createDemoState() {
+      // Генерируем реалистичные даты относительно сегодняшнего дня
+      const clients = [
+        { id: 'c_anna', name: 'Анна (Мейн-кун Ричи)', contact: 'Авито • Можайский', dailyRateOverride: null, notes: 'Берет стабильно по 10 шт, самовывоз вечером' },
+        { id: 'c_dmitry', name: 'Дмитрий (2 бенгала)', contact: 'Авито • Кунцево', dailyRateOverride: null, notes: 'Два активных кота, улетает быстро' },
+        { id: 'c_olga', name: 'Ольга (Британец Марсель)', contact: 'Авито • Сетунь', dailyRateOverride: null, notes: 'Любит без лишней моркови, берет по 5-7 шт' },
+        { id: 'c_maxim', name: 'Максим (Шотландец)', contact: 'Авито', dailyRateOverride: 1, notes: 'Первый пробный набор на 3 шт' },
+        { id: 'c_elena', name: 'Елена (Сибирская Муся)', contact: 'Авито • Одинцово', dailyRateOverride: null, notes: 'Берет по 8 шт раз в полторы недели' }
+      ];
+
+      // Закупки за последние 3 недели
+      const purchases = [
+        {
+          id: 'p_1', type: 'meat', date: daysAgoStr(21),
+          meatCost: 4850, containersCost: 540, qtyProduced: 38, weightKg: 11.4, containersBought: 60,
+          note: 'Первая крупная партия + упаковка контейнеров 60 шт'
+        },
+        {
+          id: 'p_2', type: 'meat', date: daysAgoStr(11),
+          meatCost: 5100, containersCost: 0, qtyProduced: 40, weightKg: 12.0, containersBought: 0,
+          note: 'Закупка мяса на базе, контейнеры были в запасе'
+        },
+        {
+          id: 'p_3', type: 'containers', date: daysAgoStr(6),
+          meatCost: 0, containersCost: 890, qtyProduced: 0, weightKg: 0, containersBought: 100,
+          note: 'Контейнеры 300 мл с крышками (100 шт на WB)'
+        },
+        {
+          id: 'p_4', type: 'meat', date: daysAgoStr(3),
+          meatCost: 4600, containersCost: 0, qtyProduced: 36, weightKg: 10.8, containersBought: 0,
+          note: 'Свежая партия, отличные желудки и сердце'
+        }
+      ];
+
+      // Хелпер создания демо-продажи
+      const makeSale = (id, daysAgo, clientId, qty, isPromo) => {
+        const total = calculateSalePrice(qty, isPromo, 210, 550);
+        const pocket = Math.round(total * 0.5);
+        return {
+          id,
+          date: daysAgoStr(daysAgo),
+          clientId,
+          qty,
+          isPromoApplied: isPromo,
+          totalPrice: total,
+          pocketShare: pocket,
+          fundShare: total - pocket,
+          note: ''
+        };
+      };
+
+      const sales = [
+        // Анна: взяла 10 шт 19 дней назад, потом 10 шт 9 дней назад -> темп 10 дн / 10 шт = 1 дн/шт -> след заказ через 1 день! (В РАДАРЕ!)
+        makeSale('s_1', 19, 'c_anna', 10, true),
+        makeSale('s_2', 9, 'c_anna', 10, false),
+
+        // Дмитрий (2 бенгала): взял 10 шт 17 дней назад, потом 10 шт 11 дней назад (6 дн / 10 шт = 0.6 дн/шт), потом 10 шт 5 дней назад (6 дн -> след через 1 день) -> В РАДАРЕ!
+        makeSale('s_3', 17, 'c_dmitry', 10, true),
+        makeSale('s_4', 11, 'c_dmitry', 10, false),
+        makeSale('s_5', 6, 'c_dmitry', 8, false), // 8 * 0.6 = ~5 дней -> сегодня/просрочка 1 день!
+
+        // Ольга: 5 шт 15 дней назад, 7 шт 9 дней назад (6д/5шт = 1.2 дн/шт -> след через 8.4 дн -> сегодня/завтра)
+        makeSale('s_6', 15, 'c_olga', 5, true),
+        makeSale('s_7', 7, 'c_olga', 7, false),
+
+        // Максим: 1 заказ 4 дня назад на 3 шт -> базовый темп 1 шт/день -> пора писать!
+        makeSale('s_8', 4, 'c_maxim', 3, true),
+
+        // Елена: 8 шт 12 дней назад, 10 шт 2 дня назад -> запас хороший (~10-12 дней)
+        makeSale('s_9', 12, 'c_elena', 8, true),
+        makeSale('s_10', 2, 'c_elena', 10, false),
+      ];
+
+      // Подсчитаем реальный остаток по демо: произведено 38+40+36=114, продано 81, съела своя кошка 5 -> в морозилке 28
+      return {
+        isDemo: true,
+        settings: {
+          unitPrice: 210,
+          promo3Price: 550,
+          pocketPercent: 50,
+          startingFund: 6500,
+          defaultDailyRate: 1
+        },
+        inventory: {
+          freezerStock: 28,
+          emptyContainers: 46,
+          catConsumed: 5
+        },
+        clients,
+        sales,
+        purchases
+      };
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.settings && parsed.inventory) {
+            appData = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Ошибка чтения localStorage:', e);
+      }
+      appData = createDemoState();
+      saveData();
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        console.error('Ошибка сохранения в localStorage:', e);
+        showToast('Не удалось сохранить данные (проверьте память браузера)', 'error');
+      }
+    }
+
+    /* =========================================================================
+       БИЗНЕС-РАСЧЕТЫ: ЦЕНА, ФИНАНСЫ, СЕБЕСТОИМОСТЬ, ПРОГНОЗ КЛИЕНТОВ
+       ========================================================================= */
+
+    /**
+     * Расчет цены продажи:
+     * Базовая: 210 ₽/шт.
+     * Скидка новичка: 3 шт за 550 ₽.
+     * Если > 3 шт и скидка активна: 550 + (qty - 3) * 210.
+     * Если 1 или 2 шт: qty * 210.
+     */
+    function calculateSalePrice(qty, applyPromo, unitPrice = appData.settings.unitPrice, promo3Price = appData.settings.promo3Price) {
+      const q = Math.max(0, Number(qty) || 0);
+      if (q === 0) return 0;
+      if (applyPromo && q >= 3) {
+        return promo3Price + (q - 3) * unitPrice;
+      }
+      return q * unitPrice;
+    }
+
+    function getClientById(id) {
+      return appData.clients.find(c => c.id === id) || null;
+    }
+
+    function getClientSales(clientId) {
+      return appData.sales
+        .filter(s => s.clientId === clientId)
+        .sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    /**
+     * Умный прогноз повторного заказа для клиента:
+     * - Группируем заказы клиента по датам.
+     * - Если >= 2 разных дат:
+     *   daysBetween = дней между первой и последней датой
+     *   consumedQty = сумма банок во всех заказах КРОМЕ последнего дня
+     *   daysPerUnit = daysBetween / consumedQty
+     *   nextDate = lastDate + round(lastOrderQty * daysPerUnit)
+     * - Если 1 дата (или 1 заказ):
+     *   используем dailyRateOverride клиента или defaultDailyRate (1 банка/день -> 1 день на банку).
+     */
+    function computeClientForecast(client) {
+      const sales = getClientSales(client.id);
+      const totalOrders = sales.length;
+      const totalQty = sales.reduce((sum, s) => sum + s.qty, 0);
+      const totalSpent = sales.reduce((sum, s) => sum + s.totalPrice, 0);
+
+      if (totalOrders === 0) {
+        return {
+          client,
+          totalOrders: 0,
+          totalQty: 0,
+          totalSpent: 0,
+          usualQty: 3,
+          hasForecast: false,
+          daysPerUnit: 1 / (client.dailyRateOverride || appData.settings.defaultDailyRate || 1),
+          isSmartRate: false,
+          lastOrderDate: null,
+          lastOrderQty: 0,
+          nextOrderDate: null,
+          daysLeft: 999,
+          cycleDays: 0,
+          progressPct: 100,
+          status: 'new'
+        };
+      }
+
+      // Группировка по дате для устойчивости расчетов
+      const byDateMap = new Map();
+      sales.forEach(s => {
+        byDateMap.set(s.date, (byDateMap.get(s.date) || 0) + s.qty);
+      });
+      const dateEntries = Array.from(byDateMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+      const firstDate = dateEntries[0][0];
+      const lastDate = dateEntries[dateEntries.length - 1][0];
+      const lastBatchQty = dateEntries[dateEntries.length - 1][1];
+      const lastSingleOrderQty = sales[sales.length - 1].qty;
+
+      let daysPerUnit;
+      let isSmartRate = false;
+
+      if (client.dailyRateOverride && client.dailyRateOverride > 0) {
+        // Если пользователь вручную указал расход (например, 2 банки/день)
+        daysPerUnit = 1 / client.dailyRateOverride;
+        isSmartRate = false;
+      } else if (dateEntries.length >= 2) {
+        const spanDays = Math.max(1, diffDays(firstDate, lastDate));
+        const qtyExcludingLast = dateEntries
+          .slice(0, -1)
+          .reduce((sum, [, q]) => sum + q, 0);
+        daysPerUnit = qtyExcludingLast > 0 ? (spanDays / qtyExcludingLast) : 1;
+        // Адекватные границы темпа
+        daysPerUnit = Math.max(0.15, Math.min(10, daysPerUnit));
+        isSmartRate = true;
+      } else {
+        daysPerUnit = 1 / (appData.settings.defaultDailyRate || 1);
+        isSmartRate = false;
+      }
+
+      const cycleDays = Math.max(1, Math.round(lastBatchQty * daysPerUnit));
+      const nextOrderDate = addDaysStr(lastDate, cycleDays);
+      const today = todayStr();
+      const daysLeft = diffDays(today, nextOrderDate); // отрицательное = просрочено
+      const elapsedDays = Math.max(0, diffDays(lastDate, today));
+      const progressPct = Math.max(0, Math.min(100, Math.round(((cycleDays - elapsedDays) / cycleDays) * 100)));
+
+      let status = 'ok';
+      if (daysLeft < 0) status = 'overdue';
+      else if (daysLeft === 0) status = 'today';
+      else if (daysLeft <= 3) status = 'soon';
+
+      return {
+        client,
+        totalOrders,
+        totalQty,
+        totalSpent,
+        usualQty: lastSingleOrderQty,
+        hasForecast: true,
+        daysPerUnit,
+        isSmartRate,
+        lastOrderDate: lastDate,
+        lastOrderQty: lastBatchQty,
+        nextOrderDate,
+        daysLeft,
+        cycleDays,
+        progressPct,
+        status
+      };
+    }
+
+    function getAllClientForecasts() {
+      return appData.clients.map(c => computeClientForecast(c));
+    }
+
+    /**
+     * Общие финансовые и производственные показатели
+     */
+    function computeMetrics() {
+      const totalRevenue = appData.sales.reduce((s, x) => s + x.totalPrice, 0);
+      const totalPocket = appData.sales.reduce((s, x) => s + x.pocketShare, 0);
+      const totalFundIncome = appData.sales.reduce((s, x) => s + x.fundShare, 0);
+      const totalQtySold = appData.sales.reduce((s, x) => s + x.qty, 0);
+
+      let totalMeatExpense = 0;
+      let totalContainerExpense = 0;
+      let totalProduced = 0;
+      let totalContainersBought = 0;
+      let bestBatch = null;
+
+      appData.purchases.forEach(p => {
+        totalMeatExpense += (Number(p.meatCost) || 0);
+        totalContainerExpense += (Number(p.containersCost) || 0);
+        totalProduced += (Number(p.qtyProduced) || 0);
+        totalContainersBought += (Number(p.containersBought) || 0);
+
+        if (p.type === 'meat' && p.qtyProduced > 0) {
+          const unitMeatCost = p.meatCost / p.qtyProduced;
+          if (!bestBatch || unitMeatCost < bestBatch.unitCost) {
+            bestBatch = {
+              date: p.date,
+              qty: p.qtyProduced,
+              unitCost: unitMeatCost,
+              cost: p.meatCost
+            };
+          }
+        }
+      });
+
+      const totalExpenses = totalMeatExpense + totalContainerExpense;
+      const fundBalance = (Number(appData.settings.startingFund) || 0) + totalFundIncome - totalExpenses;
+      const netProfit = totalRevenue - totalExpenses;
+      const avgCheck = appData.sales.length > 0 ? Math.round(totalRevenue / appData.sales.length) : 0;
+
+      // Средняя себестоимость 1 банки (мясо + тара)
+      const avgMeatPerUnit = totalProduced > 0 ? (totalMeatExpense / totalProduced) : 0;
+      let avgContainerPerUnit = 0;
+      if (totalContainersBought > 0 && totalContainerExpense > 0) {
+        avgContainerPerUnit = totalContainerExpense / totalContainersBought;
+      } else if (totalProduced > 0 && totalContainerExpense > 0) {
+        avgContainerPerUnit = totalContainerExpense / totalProduced;
+      }
+
+      const totalUnitCost = avgMeatPerUnit + avgContainerPerUnit;
+      const unitMargin = Math.max(0, appData.settings.unitPrice - totalUnitCost);
+      const marginPct = appData.settings.unitPrice > 0
+        ? Math.round((unitMargin / appData.settings.unitPrice) * 100)
+        : 0;
+
+      return {
+        totalRevenue,
+        totalPocket,
+        totalFundIncome,
+        totalExpenses,
+        totalMeatExpense,
+        totalContainerExpense,
+        fundBalance,
+        netProfit,
+        totalQtySold,
+        totalProduced,
+        avgCheck,
+        avgMeatPerUnit,
+        avgContainerPerUnit,
+        totalUnitCost,
+        unitMargin,
+        marginPct,
+        bestBatch
+      };
+    }
+
+    function generateAvitoMessage(forecast) {
+      const firstName = (forecast.client.name.split(' ')[0] || 'Здравствуйте').replace(/[()]/g, '');
+      const qty = forecast.usualQty || 5;
+      if (forecast.daysLeft <= 0) {
+        return `Здравствуйте, ${firstName}! 😊 Пишу напомнить о себе — по моим подсчетам, у вашего котика как раз должен заканчиваться наш мясной микс. Готовим свежую партию, отложить для вас привычные ${qty} шт? 🐾`;
+      }
+      return `Здравствуйте, ${firstName}! 😊 Скоро у вашего котика подойдет к концу наш мясной микс. Если нужно, могу заранее отложить свежую партию (например, ${qty} шт), чтобы точно было в наличии! 🐾`;
+    }
+
+    /* =========================================================================
+       РЕНДЕР ПРИЛОЖЕНИЯ И НАВИГАЦИЯ
+       ========================================================================= */
+
+    function switchTab(tab) {
+      uiState.activeTab = tab;
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderAll() {
+      // Обновляем шапку
+      const stock = appData.inventory.freezerStock;
+      const headerStockEl = document.getElementById('header-freezer-count');
+      headerStockEl.textContent = `${stock} шт`;
+      headerStockEl.parentElement.className = stock <= 5
+        ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/35 text-rose-300 active:scale-95 transition'
+        : 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#38BDF8]/12 border border-[#38BDF8]/25 text-[#38BDF8] active:scale-95 transition';
+
+      // Баннер демо-данных
+      const demoBanner = document.getElementById('demo-banner');
+      if (appData.isDemo) {
+        demoBanner.classList.remove('hidden');
+      } else {
+        demoBanner.classList.add('hidden');
+      }
+
+      // Индикатор радара в нижней навигации
+      const forecasts = getAllClientForecasts();
+      const radarList = forecasts
+        .filter(f => f.hasForecast && f.daysLeft <= 3)
+        .sort((a, b) => a.daysLeft - b.daysLeft);
+
+      const radarDot = document.getElementById('nav-radar-dot');
+      if (radarList.length > 0) radarDot.classList.remove('hidden');
+      else radarDot.classList.add('hidden');
+
+      // Подсветка активной вкладки
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === uiState.activeTab;
+        btn.className = `nav-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl transition active:scale-95 ${
+          isActive ? 'text-[#FF6B4A] bg-[#FF6B4A]/10' : 'text-slate-400 hover:text-slate-200'
+        }`;
+      });
+
+      // Подзаголовок шапки
+      const subtitles = {
+        home: 'Сводка и аналитика',
+        sales: `История продаж (${appData.sales.length})`,
+        purchases: `Партии мяса и тара (${appData.purchases.length})`,
+        clients: `База клиентов (${appData.clients.length})`
+      };
+      document.getElementById('header-subtitle').textContent = subtitles[uiState.activeTab];
+
+      // Уничтожаем старые экземпляры графиков перед перерисовкой
+      destroyCharts();
+
+      const main = document.getElementById('main-content');
+      if (uiState.activeTab === 'home') {
+        main.innerHTML = renderHomeTab(radarList);
+        requestAnimationFrame(() => initHomeCharts());
+      } else if (uiState.activeTab === 'sales') {
+        main.innerHTML = renderSalesTab();
+      } else if (uiState.activeTab === 'purchases') {
+        main.innerHTML = renderPurchasesTab();
+      } else if (uiState.activeTab === 'clients') {
+        main.innerHTML = renderClientsTab(forecasts);
+      }
+    }
+
+    function destroyCharts() {
+      if (uiState.charts.finance) {
+        uiState.charts.finance.destroy();
+        uiState.charts.finance = null;
+      }
+      if (uiState.charts.unit) {
+        uiState.charts.unit.destroy();
+        uiState.charts.unit = null;
+      }
+    }
+
+    /* =========================================================================
+       ВКЛАДКА 1: ГЛАВНАЯ (DASHBOARD)
+       ========================================================================= */
+
+    function renderHomeTab(radarList) {
+      const m = computeMetrics();
+      const pocketPct = appData.settings.pocketPercent;
+      const fundPct = 100 - pocketPct;
+      const stock = appData.inventory.freezerStock;
+      const stockKg = (stock * 0.3).toFixed(1);
+      const freezerFillPct = Math.max(0, Math.min(100, Math.round((stock / 45) * 100)));
+
+      return `
+        <!-- Главная финансовая карточка -->
+        <section class="hero-glow rounded-[24px] p-5 shadow-2xl">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+                В мой карман (${pocketPct}%)
+              </p>
+              <div class="mt-1 text-[34px] font-extrabold tracking-tight text-[#22C55E] tnum leading-none">
+                ${formatRub(m.totalPocket)}
+              </div>
+              <p class="mt-2 text-xs text-slate-400 tnum">
+                Общая выручка: <span class="text-slate-200 font-semibold">${formatRub(m.totalRevenue)}</span>
+              </p>
+            </div>
+            <div class="px-2.5 py-1 rounded-xl bg-white/[0.06] border border-white/[0.08] text-right">
+              <p class="text-[10px] text-slate-400">Чистая прибыль</p>
+              <p class="text-xs font-bold tnum ${m.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${m.netProfit >= 0 ? '+' : ''}${formatRub(m.netProfit)}</p>
+            </div>
+          </div>
+
+          <!-- Подразделы фонда и расходов -->
+          <div class="mt-4 grid grid-cols-2 gap-2.5">
+            <div class="rounded-2xl bg-black/25 border border-white/[0.06] p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] text-slate-400">Фонд закупки (${fundPct}%)</span>
+              </div>
+              <div class="mt-1 text-base font-bold tnum ${m.fundBalance >= 0 ? 'text-white' : 'text-rose-400'}">
+                ${formatRub(m.fundBalance)}
+              </div>
+              <div class="text-[10px] text-slate-500 mt-0.5 tnum">Пополнено: ${formatRub(m.totalFundIncome)}</div>
+            </div>
+
+            <div class="rounded-2xl bg-black/25 border border-white/[0.06] p-3">
+              <span class="text-[11px] text-slate-400">Всего потрачено</span>
+              <div class="mt-1 text-base font-bold text-slate-100 tnum">
+                ${formatRub(m.totalExpenses)}
+              </div>
+              <div class="text-[10px] text-slate-500 mt-0.5 tnum">Мясо: ${formatRub(m.totalMeatExpense)}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Быстрые действия за 1 тап -->
+        <section class="grid grid-cols-2 gap-3">
+          <button onclick="openSaleModal()" class="py-3.5 px-4 rounded-[20px] bg-gradient-to-r from-[#FF6B4A] to-[#F43F5E] text-white font-bold text-sm shadow-lg shadow-[#FF6B4A]/25 flex items-center justify-center gap-2 active:scale-[0.97] transition">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Продажа</span>
+          </button>
+
+          <button onclick="openPurchaseModal('meat')" class="py-3.5 px-4 rounded-[20px] glass-card text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-cardHover active:scale-[0.97] transition">
+            <svg class="w-5 h-5 text-[#22C55E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Закупка</span>
+          </button>
+        </section>
+
+        <!-- Блок Морозилка и склад -->
+        <section class="freezer-glow rounded-[22px] p-4">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-2xl bg-[#38BDF8]/15 border border-[#38BDF8]/25 flex items-center justify-center text-[#38BDF8]">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-sky-200/80">Сейчас в морозилке</p>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-2xl font-extrabold text-white tnum">${stock} шт</span>
+                  <span class="text-xs text-[#38BDF8] font-medium tnum">(${stockKg} кг)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <div class="text-[11px] text-slate-400">Пустая тара</div>
+              <div class="text-sm font-bold text-slate-200 tnum">${appData.inventory.emptyContainers} шт</div>
+            </div>
+          </div>
+
+          <!-- Полоска заполненности -->
+          <div class="mt-3 h-2 w-full rounded-full bg-white/[0.07] overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500 ${stock <= 5 ? 'bg-rose-500' : 'bg-gradient-to-r from-[#38BDF8] to-cyan-300'}" style="width: ${freezerFillPct}%"></div>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button onclick="openStockModal()" class="py-2.5 px-3 rounded-xl bg-white/[0.07] border border-white/[0.08] text-xs font-semibold text-slate-200 active:scale-95 transition">
+              Скорректировать остаток
+            </button>
+            <button onclick="feedOwnCat()" class="py-2.5 px-3 rounded-xl bg-[#38BDF8]/12 border border-[#38BDF8]/25 text-xs font-semibold text-[#38BDF8] active:scale-95 transition flex items-center justify-center gap-1.5">
+              <span>🐾</span>
+              <span>-1 своей кошке</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Радар заказов -->
+        <section class="glass-card rounded-[22px] p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B] ${radarList.length > 0 ? 'animate-pulse' : ''}"></span>
+              <h2 class="text-sm font-bold text-white">Радар заказов</h2>
+            </div>
+            <button onclick="switchTab('clients')" class="text-xs font-semibold text-[#F59E0B]">Все клиенты →</button>
+          </div>
+
+          ${radarList.length === 0 ? `
+            <div class="py-4 text-center rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+              <p class="text-sm font-semibold text-slate-200">Все котики пока сыты 🐱</p>
+              <p class="text-xs text-slate-400 mt-1">В ближайшие 3 дня корм ни у кого не заканчивается</p>
+            </div>
+          ` : `
+            <div class="space-y-2.5">
+              ${radarList.map(f => renderRadarItem(f)).join('')}
+            </div>
+          `}
+        </section>
+
+        <!-- График 1: Выручка vs Расходы vs В карман -->
+        <section class="glass-card rounded-[22px] p-4">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="text-sm font-bold text-white">Динамика финансов</h2>
+              <p class="text-[11px] text-slate-400">Выручка, расходы и в карман</p>
+            </div>
+            <div class="flex p-1 rounded-xl bg-black/35 border border-white/[0.06] text-[11px] font-semibold">
+              ${['day', 'week', 'month'].map(p => {
+                const labels = { day: 'Дни', week: 'Недели', month: 'Месяцы' };
+                const active = uiState.chartPeriod === p;
+                return `<button onclick="setChartPeriod('${p}')" class="px-2.5 py-1 rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-400'}">${labels[p]}</button>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="relative h-52 w-full">
+            <canvas id="finance-chart"></canvas>
+          </div>
+        </section>
+
+        <!-- График 2: Экономика 1 банки + KPI -->
+        <section class="glass-card rounded-[22px] p-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-bold text-white">Экономика 1 банки (300 г)</h2>
+              <p class="text-[11px] text-slate-400">Из цены ${formatRub(appData.settings.unitPrice)}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-xl bg-[#22C55E]/15 text-[#22C55E] text-xs font-bold tnum">
+              Маржа ${m.marginPct}%
+            </span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-3 items-center">
+            <div class="col-span-2 relative h-36">
+              <canvas id="unit-chart"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-xs text-slate-400">Маржа</span>
+                <span class="text-base font-extrabold text-[#22C55E] tnum">+${Math.round(m.unitMargin)} ₽</span>
+              </div>
+            </div>
+            <div class="col-span-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03]">
+                <span class="flex items-center gap-2 text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-[#FF6B4A]"></span>Мясо</span>
+                <span class="font-bold tnum">${Math.round(m.avgMeatPerUnit)} ₽</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03]">
+                <span class="flex items-center gap-2 text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-[#38BDF8]"></span>Контейнер</span>
+                <span class="font-bold tnum">${Math.round(m.avgContainerPerUnit)} ₽</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03]">
+                <span class="flex items-center gap-2 text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span>Чистая маржа</span>
+                <span class="font-bold text-[#22C55E] tnum">+${Math.round(m.unitMargin)} ₽</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 мини-метрики -->
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <div class="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-2.5 text-center">
+              <p class="text-[10px] text-slate-400">Продано всего</p>
+              <p class="text-sm font-extrabold text-white tnum mt-0.5">${m.totalQtySold} шт</p>
+            </div>
+            <div class="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-2.5 text-center">
+              <p class="text-[10px] text-slate-400">Средний чек</p>
+              <p class="text-sm font-extrabold text-white tnum mt-0.5">${formatRub(m.avgCheck)}</p>
+            </div>
+            <div class="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-2.5 text-center">
+              <p class="text-[10px] text-slate-400">Лучшая партия</p>
+              <p class="text-sm font-extrabold text-[#38BDF8] tnum mt-0.5">${m.bestBatch ? Math.round(m.bestBatch.unitCost) + ' ₽/шт' : '—'}</p>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderRadarItem(f) {
+      let badgeText = '';
+      let badgeCls = '';
+      if (f.daysLeft < 0) {
+        badgeText = `Пора писать! (${Math.abs(f.daysLeft)} дн.)`;
+        badgeCls = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+      } else if (f.daysLeft === 0) {
+        badgeText = 'Заканчивается сегодня';
+        badgeCls = 'bg-[#FF6B4A]/20 text-[#FF6B4A] border-[#FF6B4A]/30';
+      } else {
+        badgeText = `Через ${f.daysLeft} дн.`;
+        badgeCls = 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/30';
+      }
+
+      const initial = (f.client.name.trim()[0] || '?').toUpperCase();
+
+      return `
+        <div class="p-3 rounded-2xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0" onclick="openClientDetailModal('${f.client.id}')">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#F59E0B]/30 to-[#FF6B4A]/30 border border-white/10 flex items-center justify-center text-xs font-bold text-amber-200 shrink-0">
+              ${escapeHtml(initial)}
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-bold text-white truncate">${escapeHtml(f.client.name)}</p>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badgeCls}">${badgeText}</span>
+                <span class="text-[10px] text-slate-400 tnum">обычно ${f.usualQty} шт</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="copyAvitoForClient('${f.client.id}')" title="Скопировать сообщение для Авито" class="w-8 h-8 rounded-xl bg-white/[0.07] hover:bg-white/15 flex items-center justify-center text-amber-300 active:scale-90 transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+            <button onclick="openSaleModal('${f.client.id}', ${f.usualQty})" title="Повторить заказ" class="w-8 h-8 rounded-xl bg-[#FF6B4A]/20 border border-[#FF6B4A]/30 flex items-center justify-center text-[#FF6B4A] active:scale-90 transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setChartPeriod(period) {
+      uiState.chartPeriod = period;
+      renderAll();
+    }
+
+    /* =========================================================================
+       ИНИЦИАЛИЗАЦИЯ ГРАФИКОВ CHART.JS
+       ========================================================================= */
+
+    function initHomeCharts() {
+      const finCanvas = document.getElementById('finance-chart');
+      const unitCanvas = document.getElementById('unit-chart');
+      if (!finCanvas || !unitCanvas || typeof Chart === 'undefined') return;
+
+      // 1. Подготовка данных по периодам
+      const buckets = buildFinanceBuckets(uiState.chartPeriod);
+      const ctx = finCanvas.getContext('2d');
+
+      const gradRev = ctx.createLinearGradient(0, 0, 0, 200);
+      gradRev.addColorStop(0, 'rgba(255, 107, 74, 0.35)');
+      gradRev.addColorStop(1, 'rgba(255, 107, 74, 0.0)');
+
+      const gradPocket = ctx.createLinearGradient(0, 0, 0, 200);
+      gradPocket.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
+      gradPocket.addColorStop(1, 'rgba(34, 197, 94, 0.0)');
+
+      uiState.charts.finance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: buckets.labels,
+          datasets: [
+            {
+              type: 'line',
+              label: 'Выручка',
+              data: buckets.revenue,
+              borderColor: '#FF6B4A',
+              backgroundColor: gradRev,
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointBackgroundColor: '#FF6B4A',
+              order: 1
+            },
+            {
+              type: 'line',
+              label: 'В карман',
+              data: buckets.pocket,
+              borderColor: '#22C55E',
+              backgroundColor: gradPocket,
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2,
+              pointRadius: 2.5,
+              pointBackgroundColor: '#22C55E',
+              order: 2
+            },
+            {
+              type: 'bar',
+              label: 'Расходы',
+              data: buckets.expenses,
+              backgroundColor: 'rgba(148, 163, 184, 0.32)',
+              borderColor: 'rgba(148, 163, 184, 0.6)',
+              borderWidth: 1,
+              borderRadius: 6,
+              maxBarThickness: 18,
+              order: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#94A3B8',
+                boxWidth: 10,
+                boxHeight: 10,
+                usePointStyle: true,
+                font: { family: 'Inter', size: 11 }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(15, 19, 29, 0.96)',
+              borderColor: 'rgba(255,255,255,0.12)',
+              borderWidth: 1,
+              titleColor: '#F8FAFC',
+              bodyColor: '#CBD5E1',
+              padding: 10,
+              cornerRadius: 12,
+              callbacks: {
+                label: (c) => ` ${c.dataset.label}: ${formatRub(c.raw)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748B', font: { size: 10 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: {
+                color: '#64748B',
+                font: { size: 10 },
+                callback: (v) => v >= 1000 ? (v / 1000).toFixed(0) + 'к' : v
+              }
+            }
+          }
+        }
+      });
+
+      // 2. Кольцевой график себестоимости 1 банки
+      const m = computeMetrics();
+      const hasData = m.totalProduced > 0;
+      const meatVal = hasData ? Math.round(m.avgMeatPerUnit) : 130;
+      const contVal = hasData ? Math.round(m.avgContainerPerUnit) : 9;
+      const margVal = hasData ? Math.max(0, Math.round(m.unitMargin)) : 71;
+
+      uiState.charts.unit = new Chart(unitCanvas.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Мясо', 'Контейнер', 'Маржа'],
+          datasets: [{
+            data: [meatVal, contVal, margVal],
+            backgroundColor: ['#FF6B4A', '#38BDF8', '#22C55E'],
+            borderColor: '#151924',
+            borderWidth: 3,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 19, 29, 0.96)',
+              borderColor: 'rgba(255,255,255,0.12)',
+              borderWidth: 1,
+              cornerRadius: 10,
+              callbacks: {
+                label: (c) => ` ${c.label}: ${formatRub(c.raw)}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function buildFinanceBuckets(period) {
+      const labels = [];
+      const revenue = [];
+      const pocket = [];
+      const expenses = [];
+
+      if (period === 'day') {
+        // Последние 10 дней
+        for (let i = 9; i >= 0; i--) {
+          const ds = daysAgoStr(i);
+          const d = parseLocalDate(ds);
+          labels.push(`${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`);
+
+          const daySales = appData.sales.filter(s => s.date === ds);
+          const dayPurch = appData.purchases.filter(p => p.date === ds);
+          revenue.push(daySales.reduce((a, b) => a + b.totalPrice, 0));
+          pocket.push(daySales.reduce((a, b) => a + b.pocketShare, 0));
+          expenses.push(dayPurch.reduce((a, b) => a + (b.meatCost || 0) + (b.containersCost || 0), 0));
+        }
+      } else if (period === 'week') {
+        // Последние 6 недель
+        for (let w = 5; w >= 0; w--) {
+          const startStr = daysAgoStr(w * 7 + 6);
+          const endStr = daysAgoStr(w * 7);
+          const sd = parseLocalDate(startStr);
+          labels.push(`с ${sd.getDate()}.${String(sd.getMonth() + 1).padStart(2, '0')}`);
+
+          const wSales = appData.sales.filter(s => s.date >= startStr && s.date <= endStr);
+          const wPurch = appData.purchases.filter(p => p.date >= startStr && p.date <= endStr);
+          revenue.push(wSales.reduce((a, b) => a + b.totalPrice, 0));
+          pocket.push(wSales.reduce((a, b) => a + b.pocketShare, 0));
+          expenses.push(wPurch.reduce((a, b) => a + (b.meatCost || 0) + (b.containersCost || 0), 0));
+        }
+      } else {
+        // Последние 6 месяцев
+        const now = new Date();
+        for (let m = 5; m >= 0; m--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - m, 1);
+          const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          labels.push(d.toLocaleDateString('ru-RU', { month: 'short' }));
+
+          const mSales = appData.sales.filter(s => s.date.startsWith(ym));
+          const mPurch = appData.purchases.filter(p => p.date.startsWith(ym));
+          revenue.push(mSales.reduce((a, b) => a + b.totalPrice, 0));
+          pocket.push(mSales.reduce((a, b) => a + b.pocketShare, 0));
+          expenses.push(mPurch.reduce((a, b) => a + (b.meatCost || 0) + (b.containersCost || 0), 0));
+        }
+      }
+
+      return { labels, revenue, pocket, expenses };
+    }
+
+    /* =========================================================================
+       ВКЛАДКА 2: ПРОДАЖИ
+       ========================================================================= */
+
+    function renderSalesTab() {
+      const m = computeMetrics();
+      const query = uiState.salesSearch.trim().toLowerCase();
+
+      const filtered = appData.sales
+        .filter(s => {
+          if (uiState.salesFilter === 'promo' && !s.isPromoApplied) return false;
+          if (uiState.salesFilter === 'regular' && s.isPromoApplied) return false;
+          if (query) {
+            const client = getClientById(s.clientId);
+            const name = client ? client.name.toLowerCase() : '';
+            if (!name.includes(query) && !(s.note || '').toLowerCase().includes(query)) return false;
+          }
+          return true;
+        })
+        .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+
+      // Группировка по датам
+      const groups = new Map();
+      filtered.forEach(s => {
+        if (!groups.has(s.date)) groups.set(s.date, []);
+        groups.get(s.date).push(s);
+      });
+
+      return `
+        <!-- Сводка и кнопка новой продажи -->
+        <section class="glass-card rounded-[22px] p-4 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[11px] text-slate-400">Всего продано</p>
+            <div class="flex items-baseline gap-2 mt-0.5">
+              <span class="text-xl font-extrabold text-white tnum">${formatRub(m.totalRevenue)}</span>
+              <span class="text-xs font-semibold text-[#FF6B4A] tnum">${m.totalQtySold} шт</span>
+            </div>
+          </div>
+          <button onclick="openSaleModal()" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF6B4A] to-[#F43F5E] text-white text-xs font-bold shadow-lg shadow-[#FF6B4A]/25 active:scale-95 transition shrink-0">
+            + Продажа
+          </button>
+        </section>
+
+        <!-- Поиск и фильтры -->
+        <section class="space-y-2.5">
+          <div class="relative">
+            <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" value="${escapeHtml(uiState.salesSearch)}" oninput="uiState.salesSearch=this.value; renderAll()" placeholder="Поиск по имени клиента..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#151924] border border-white/[0.08] text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B4A]/60" />
+          </div>
+          <div class="flex gap-2 overflow-x-auto no-scrollbar">
+            ${[
+              { k: 'all', l: 'Все' },
+              { k: 'regular', l: 'Постоянные' },
+              { k: 'promo', l: 'Скидка 3 за 550 ₽' }
+            ].map(f => `
+              <button onclick="uiState.salesFilter='${f.k}'; renderAll()" class="px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 border transition ${
+                uiState.salesFilter === f.k
+                  ? 'bg-[#FF6B4A]/15 border-[#FF6B4A]/40 text-[#FF6B4A]'
+                  : 'bg-white/[0.04] border-white/[0.07] text-slate-400'
+              }">${f.l}</button>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- Список продаж -->
+        ${filtered.length === 0 ? `
+          <div class="glass-card rounded-[22px] p-8 text-center">
+            <p class="text-sm font-semibold text-slate-200">Продаж пока нет</p>
+            <p class="text-xs text-slate-400 mt-1">Нажмите «+ Продажа», чтобы записать первый заказ</p>
+          </div>
+        ` : Array.from(groups.entries()).map(([date, list]) => {
+          const daySum = list.reduce((a, b) => a + b.totalPrice, 0);
+          return `
+            <section class="space-y-2">
+              <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-bold text-slate-400">${formatDateHuman(date)}</span>
+                <span class="text-xs font-semibold text-slate-500 tnum">${formatRub(daySum)}</span>
+              </div>
+              <div class="space-y-2">
+                ${list.map(s => {
+                  const client = getClientById(s.clientId);
+                  const clientName = client ? client.name : 'Удаленный клиент';
+                  return `
+                    <div class="glass-card rounded-[20px] p-3.5 flex items-center justify-between gap-3">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                          <p class="text-sm font-bold text-white truncate">${escapeHtml(clientName)}</p>
+                          ${s.isPromoApplied ? `<span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FF6B4A]/15 text-[#FF6B4A]">Акция</span>` : ''}
+                        </div>
+                        <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1 text-[11px] text-slate-400 tnum">
+                          <span class="text-slate-200 font-semibold">${s.qty} шт (${(s.qty * 0.3).toFixed(1)} кг)</span>
+                          <span class="text-[#22C55E]">+${formatRub(s.pocketShare)} карман</span>
+                          <span>+${formatRub(s.fundShare)} фонд</span>
+                        </div>
+                        ${s.note ? `<p class="text-[11px] text-slate-500 mt-1 truncate">${escapeHtml(s.note)}</p>` : ''}
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <div class="text-right">
+                          <div class="text-sm font-extrabold text-white tnum">${formatRub(s.totalPrice)}</div>
+                          <div class="text-[10px] text-slate-500 tnum">${Math.round(s.totalPrice / Math.max(1, s.qty))} ₽/шт</div>
+                        </div>
+                        <button onclick="confirmDeleteSale('${s.id}')" aria-label="Удалить продажу" class="w-8 h-8 rounded-xl bg-white/[0.04] hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition active:scale-90">
+                          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </section>
+          `;
+        }).join('')}
+      `;
+    }
+
+    /* =========================================================================
+       ВКЛАДКА 3: ЗАКУПКИ И КАЛЬКУЛЯТОР МЯСА
+       ========================================================================= */
+
+    function renderPurchasesTab() {
+      const m = computeMetrics();
+      const sorted = [...appData.purchases].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+
+      return `
+        <!-- Сводка закупок -->
+        <section class="glass-card rounded-[22px] p-4 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <p class="text-[11px] text-slate-400">Средняя себестоимость банки</p>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <span class="text-2xl font-extrabold text-white tnum">${m.totalProduced > 0 ? Math.round(m.totalUnitCost) + ' ₽' : '—'}</span>
+                ${m.totalProduced > 0 ? `<span class="text-xs font-bold text-[#22C55E] tnum">+${Math.round(m.unitMargin)} ₽ маржа</span>` : ''}
+              </div>
+            </div>
+            <button onclick="openPurchaseModal('meat')" class="px-4 py-2.5 rounded-2xl bg-[#22C55E] text-slate-950 text-xs font-bold shadow-lg shadow-[#22C55E]/20 active:scale-95 transition shrink-0">
+              + Закупка
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="p-2 rounded-xl bg-white/[0.04]">
+              <p class="text-[10px] text-slate-400">На мясо</p>
+              <p class="text-xs font-bold text-white tnum mt-0.5">${formatRub(m.totalMeatExpense)}</p>
+            </div>
+            <div class="p-2 rounded-xl bg-white/[0.04]">
+              <p class="text-[10px] text-slate-400">На тару</p>
+              <p class="text-xs font-bold text-[#38BDF8] tnum mt-0.5">${formatRub(m.totalContainerExpense)}</p>
+            </div>
+            <div class="p-2 rounded-xl bg-white/[0.04]">
+              <p class="text-[10px] text-slate-400">Сделано</p>
+              <p class="text-xs font-bold text-white tnum mt-0.5">${m.totalProduced} шт</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Сворачиваемый Калькулятор мяса на партию -->
+        <section class="glass-card rounded-[22px] overflow-hidden">
+          <button onclick="uiState.calcOpen=!uiState.calcOpen; renderAll()" class="w-full p-4 flex items-center justify-between text-left active:bg-white/[0.03] transition">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-[#FF6B4A]/15 border border-[#FF6B4A]/25 flex items-center justify-center text-[#FF6B4A]">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+                  <line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/>
+                  <line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/>
+                  <line x1="8" y1="18" x2="16" y2="18"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold text-white">Калькулятор мяса на партию</h2>
+                <p class="text-[11px] text-slate-400">Точная граммовка по вашему рецепту</p>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 transition-transform ${uiState.calcOpen ? 'rotate-180' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          ${uiState.calcOpen ? renderMeatCalculatorBody() : ''}
+        </section>
+
+        <!-- История закупок -->
+        <section class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">История партий и расходов</h3>
+            <button onclick="openPurchaseModal('containers')" class="text-xs font-semibold text-[#38BDF8]">+ Тара отдельно</button>
+          </div>
+
+          ${sorted.length === 0 ? `
+            <div class="glass-card rounded-[22px] p-8 text-center">
+              <p class="text-sm font-semibold text-slate-200">Закупок пока нет</p>
+              <p class="text-xs text-slate-400 mt-1">Добавьте партию мяса, чтобы рассчитать себестоимость и пополнить морозилку</p>
+            </div>
+          ` : sorted.map(p => {
+            const isMeat = p.type === 'meat';
+            const totalSpent = (p.meatCost || 0) + (p.containersCost || 0);
+            const unitCost = isMeat && p.qtyProduced > 0 ? Math.round(p.meatCost / p.qtyProduced) : 0;
+            const unitMargin = isMeat && p.qtyProduced > 0 ? (appData.settings.unitPrice - unitCost) : 0;
+
+            return `
+              <div class="glass-card rounded-[20px] p-3.5 space-y-2">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center ${
+                      isMeat ? 'bg-[#FF6B4A]/15 text-[#FF6B4A]' : 'bg-[#38BDF8]/15 text-[#38BDF8]'
+                    }">
+                      ${isMeat ? '🥩' : '📦'}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm font-bold text-white">${isMeat ? `Партия: +${p.qtyProduced} шт` : 'Контейнеры / Расходы'}</p>
+                        <span class="text-[10px] text-slate-400">${formatDateHuman(p.date)}</span>
+                      </div>
+                      <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[11px] text-slate-400 tnum">
+                        ${isMeat ? `
+                          <span>Себест. <b class="text-slate-200">${unitCost} ₽/шт</b></span>
+                          <span class="text-[#22C55E]">Маржа +${unitMargin} ₽</span>
+                          ${p.weightKg ? `<span>${p.weightKg} кг</span>` : ''}
+                        ` : `
+                          ${p.containersBought ? `<span class="text-[#38BDF8]">+${p.containersBought} контейнеров</span>` : '<span>Прочий расход</span>'}
+                        `}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <div class="text-right">
+                      <div class="text-sm font-extrabold text-white tnum">-${formatRub(totalSpent)}</div>
+                      ${isMeat && p.containersCost > 0 ? `<div class="text-[10px] text-[#38BDF8] tnum">+тара ${formatRub(p.containersCost)}</div>` : ''}
+                    </div>
+                    <button onclick="confirmDeletePurchase('${p.id}')" aria-label="Удалить закупку" class="w-8 h-8 rounded-xl bg-white/[0.04] hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition active:scale-90">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                </div>
+                ${p.note ? `<p class="text-[11px] text-slate-400 pl-11 leading-snug">${escapeHtml(p.note)}</p>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </section>
+      `;
+    }
+
+    function renderMeatCalculatorBody() {
+      const val = Math.max(0.3, Number(uiState.calcValue) || 0);
+      const totalKg = uiState.calcMode === 'qty' ? (val * 0.3) : val;
+      const totalGrams = Math.round(totalKg * 1000);
+      const estJars = Math.round(totalGrams / 300);
+      const sumPct = RECIPE_INGREDIENTS.reduce((a, b) => a + b.pct, 0); // 97%
+
+      const rows = RECIPE_INGREDIENTS.map(item => {
+        const normRatio = item.pct / sumPct;
+        const grams = Math.round(totalGrams * normRatio);
+        return {
+          ...item,
+          grams,
+          displayWeight: grams >= 1000 ? (grams / 1000).toFixed(2) + ' кг' : grams + ' г'
+        };
+      });
+
+      return `
+        <div class="px-4 pb-4 pt-1 border-t border-white/[0.06] space-y-3">
+          <div class="flex p-1 rounded-xl bg-black/35 border border-white/[0.06] text-xs font-semibold">
+            <button onclick="uiState.calcMode='qty'; uiState.calcValue=Math.max(1, Math.round(${estJars})); renderAll()" class="flex-1 py-1.5 rounded-lg transition ${uiState.calcMode === 'qty' ? 'bg-white/15 text-white' : 'text-slate-400'}">По банкам (шт)</button>
+            <button onclick="uiState.calcMode='kg'; uiState.calcValue=Number((${totalKg}).toFixed(1)); renderAll()" class="flex-1 py-1.5 rounded-lg transition ${uiState.calcMode === 'kg' ? 'bg-white/15 text-white' : 'text-slate-400'}">По весу (кг)</button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="number" step="${uiState.calcMode === 'kg' ? '0.5' : '1'}" min="1" value="${uiState.calcValue}" oninput="uiState.calcValue=Number(this.value)||0; updateCalcDisplay()" class="w-28 px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-base font-bold text-white tnum focus:outline-none focus:border-[#FF6B4A]" />
+            <div class="flex-1 flex gap-1.5 overflow-x-auto no-scrollbar">
+              ${(uiState.calcMode === 'qty' ? [20, 30, 40, 50] : [5, 10, 12, 15]).map(preset => `
+                <button onclick="uiState.calcValue=${preset}; renderAll()" class="px-2.5 py-2 rounded-xl text-xs font-semibold border shrink-0 ${
+                  Number(uiState.calcValue) === preset ? 'bg-[#FF6B4A]/20 border-[#FF6B4A]/40 text-[#FF6B4A]' : 'bg-white/[0.05] border-white/[0.08] text-slate-300'
+                }">${preset} ${uiState.calcMode === 'qty' ? 'шт' : 'кг'}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div id="calc-output-container">
+            <div class="flex items-center justify-between text-xs px-1 mb-2">
+              <span class="text-slate-400">Итого микса: <b class="text-white tnum">${totalKg.toFixed(1)} кг (~${estJars} шт)</b></span>
+              <span class="text-[10px] text-slate-500">норм. к 100% (рецепт ${sumPct}%)</span>
+            </div>
+
+            <div class="rounded-2xl bg-black/30 border border-white/[0.06] divide-y divide-white/[0.05]">
+              ${rows.map(r => `
+                <div class="px-3 py-2 flex items-center justify-between gap-2 text-xs">
+                  <div class="min-w-0">
+                    <span class="text-slate-200 font-medium">${r.name}</span>
+                    <span class="text-[10px] text-slate-500 ml-1">${r.pct}%</span>
+                  </div>
+                  <span class="font-bold text-white tnum shrink-0">${r.displayWeight}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <button onclick="copyRecipeList()" class="mt-2.5 w-full py-2.5 rounded-xl bg-white/[0.07] border border-white/[0.08] text-xs font-semibold text-slate-200 active:scale-[0.98] transition">
+              📋 Скопировать список покупок в Заметки
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateCalcDisplay() {
+      // Перерисовываем только блок результата без потери фокуса инпута
+      const container = document.getElementById('calc-output-container');
+      if (!container) return;
+      const val = Math.max(0, Number(uiState.calcValue) || 0);
+      const totalKg = uiState.calcMode === 'qty' ? (val * 0.3) : val;
+      const totalGrams = Math.round(totalKg * 1000);
+      const estJars = Math.round(totalGrams / 300);
+      const sumPct = RECIPE_INGREDIENTS.reduce((a, b) => a + b.pct, 0);
+
+      const rows = RECIPE_INGREDIENTS.map(item => {
+        const grams = Math.round(totalGrams * (item.pct / sumPct));
+        return {
+          ...item,
+          displayWeight: grams >= 1000 ? (grams / 1000).toFixed(2) + ' кг' : grams + ' г'
+        };
+      });
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between text-xs px-1 mb-2">
+          <span class="text-slate-400">Итого микса: <b class="text-white tnum">${totalKg.toFixed(1)} кг (~${estJars} шт)</b></span>
+          <span class="text-[10px] text-slate-500">норм. к 100% (рецепт ${sumPct}%)</span>
+        </div>
+        <div class="rounded-2xl bg-black/30 border border-white/[0.06] divide-y divide-white/[0.05]">
+          ${rows.map(r => `
+            <div class="px-3 py-2 flex items-center justify-between gap-2 text-xs">
+              <div class="min-w-0">
+                <span class="text-slate-200 font-medium">${r.name}</span>
+                <span class="text-[10px] text-slate-500 ml-1">${r.pct}%</span>
+              </div>
+              <span class="font-bold text-white tnum shrink-0">${r.displayWeight}</span>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="copyRecipeList()" class="mt-2.5 w-full py-2.5 rounded-xl bg-white/[0.07] border border-white/[0.08] text-xs font-semibold text-slate-200 active:scale-[0.98] transition">
+          📋 Скопировать список покупок в Заметки
+        </button>
+      `;
+    }
+
+    function copyRecipeList() {
+      const val = Math.max(0.3, Number(uiState.calcValue) || 0);
+      const totalKg = uiState.calcMode === 'qty' ? (val * 0.3) : val;
+      const totalGrams = Math.round(totalKg * 1000);
+      const estJars = Math.round(totalGrams / 300);
+      const sumPct = RECIPE_INGREDIENTS.reduce((a, b) => a + b.pct, 0);
+
+      const lines = [
+        `🥩 Закупка МясоМикс на ~${estJars} банок (${totalKg.toFixed(1)} кг):`,
+        ...RECIPE_INGREDIENTS.map(item => {
+          const grams = Math.round(totalGrams * (item.pct / sumPct));
+          const w = grams >= 1000 ? (grams / 1000).toFixed(2) + ' кг' : grams + ' г';
+          return `• ${item.name} — ${w}`;
+        })
+      ];
+      copyTextToClipboard(lines.join('\n'), 'Список мяса скопирован!');
+    }
+
+    /* =========================================================================
+       ВКЛАДКА 4: КЛИЕНТЫ И УМНЫЙ ПРОГНОЗ
+       ========================================================================= */
+
+    function renderClientsTab(forecasts) {
+      const q = uiState.clientsSearch.trim().toLowerCase();
+      let list = forecasts.filter(f => !q || f.client.name.toLowerCase().includes(q) || (f.client.contact || '').toLowerCase().includes(q));
+
+      if (uiState.clientsSort === 'radar') {
+        list.sort((a, b) => a.daysLeft - b.daysLeft);
+      } else if (uiState.clientsSort === 'volume') {
+        list.sort((a, b) => b.totalQty - a.totalQty);
+      } else {
+        list.sort((a, b) => a.client.name.localeCompare(b.client.name, 'ru'));
+      }
+
+      return `
+        <!-- Поиск и кнопка добавления клиента -->
+        <section class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" value="${escapeHtml(uiState.clientsSearch)}" oninput="uiState.clientsSearch=this.value; renderAll()" placeholder="Поиск клиента..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#151924] border border-white/[0.08] text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]/60" />
+          </div>
+          <button onclick="openClientDetailModal(null)" class="px-3.5 py-2.5 rounded-2xl bg-white/[0.08] border border-white/10 text-xs font-bold text-white active:scale-95 transition shrink-0">
+            + Клиент
+          </button>
+        </section>
+
+        <!-- Сортировка -->
+        <section class="flex gap-2 overflow-x-auto no-scrollbar">
+          ${[
+            { k: 'radar', l: 'По прогнозу (срочные)' },
+            { k: 'volume', l: 'По объему (VIP)' },
+            { k: 'name', l: 'По алфавиту' }
+          ].map(s => `
+            <button onclick="uiState.clientsSort='${s.k}'; renderAll()" class="px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 border transition ${
+              uiState.clientsSort === s.k
+                ? 'bg-[#F59E0B]/15 border-[#F59E0B]/40 text-[#F59E0B]'
+                : 'bg-white/[0.04] border-white/[0.07] text-slate-400'
+            }">${s.l}</button>
+          `).join('')}
+        </section>
+
+        <!-- Карточки клиентов -->
+        ${list.length === 0 ? `
+          <div class="glass-card rounded-[22px] p-8 text-center">
+            <p class="text-sm font-semibold text-slate-200">Клиентов пока нет</p>
+            <p class="text-xs text-slate-400 mt-1">Они создаются автоматически при добавлении продажи</p>
+          </div>
+        ` : `
+          <section class="space-y-3">
+            ${list.map(f => renderClientCard(f)).join('')}
+          </section>
+        `}
+      `;
+    }
+
+    function renderClientCard(f) {
+      let statusLabel = 'Нет заказов';
+      let statusCls = 'bg-slate-500/15 text-slate-400 border-slate-500/25';
+      let barCls = 'bg-slate-600';
+
+      if (f.hasForecast) {
+        if (f.daysLeft < 0) {
+          statusLabel = `Пора писать! (-${Math.abs(f.daysLeft)} дн.)`;
+          statusCls = 'bg-rose-500/20 text-rose-300 border-rose-500/35';
+          barCls = 'bg-rose-500';
+        } else if (f.daysLeft === 0) {
+          statusLabel = 'Заканчивается сегодня!';
+          statusCls = 'bg-[#FF6B4A]/20 text-[#FF6B4A] border-[#FF6B4A]/35';
+          barCls = 'bg-[#FF6B4A]';
+        } else if (f.daysLeft <= 3) {
+          statusLabel = `Через ${f.daysLeft} дн.`;
+          statusCls = 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/35';
+          barCls = 'bg-[#F59E0B]';
+        } else {
+          statusLabel = `Запас ${f.daysLeft} дн.`;
+          statusCls = 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30';
+          barCls = 'bg-[#22C55E]';
+        }
+      }
+
+      const rateText = f.isSmartRate
+        ? `реальный темп ~${f.daysPerUnit.toFixed(1)} дн/шт`
+        : `${(1 / f.daysPerUnit).toFixed(1)} шт/день`;
+
+      return `
+        <div class="glass-card rounded-[22px] p-4 space-y-3">
+          <div class="flex items-start justify-between gap-2 cursor-pointer" onclick="openClientDetailModal('${f.client.id}')">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-sm font-bold text-white truncate">${escapeHtml(f.client.name)}</h3>
+                <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5 tnum">
+                ${f.totalOrders} зак. • ${f.totalQty} шт • ${formatRub(f.totalSpent)}
+              </p>
+            </div>
+            <span class="shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-full border ${statusCls}">
+              ${statusLabel}
+            </span>
+          </div>
+
+          ${f.hasForecast ? `
+            <div class="space-y-1.5">
+              <div class="h-1.5 w-full rounded-full bg-white/[0.07] overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-500 ${barCls}" style="width: ${Math.max(4, f.progressPct)}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-400 tnum">
+                <span>Прогноз: <b class="text-slate-200">${formatDateHuman(f.nextOrderDate)}</b></span>
+                <span>${rateText}</span>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="grid grid-cols-2 gap-2 pt-0.5">
+            <button onclick="copyAvitoForClient('${f.client.id}')" class="py-2 px-3 rounded-xl bg-white/[0.06] border border-white/[0.08] text-xs font-semibold text-slate-200 active:scale-95 transition flex items-center justify-center gap-1.5">
+              <span>💬</span>
+              <span>Сообщение Авито</span>
+            </button>
+            <button onclick="openSaleModal('${f.client.id}', ${f.usualQty})" class="py-2 px-3 rounded-xl bg-[#FF6B4A]/15 border border-[#FF6B4A]/30 text-xs font-bold text-[#FF6B4A] active:scale-95 transition">
+              Повторить (${f.usualQty} шт)
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyAvitoForClient(clientId) {
+      const client = getClientById(clientId);
+      if (!client) return;
+      const forecast = computeClientForecast(client);
+      const msg = generateAvitoMessage(forecast);
+      copyTextToClipboard(msg, 'Сообщение для Авито скопировано!');
+    }
+
+    /* =========================================================================
+       МОДАЛЬНОЕ ОКНО: БАЗОВАЯ iOS BOTTOM-SHEET ОБОЛОЧКА
+       ========================================================================= */
+
+    function openSheetModal(innerHtml) {
+      const root = document.getElementById('modal-root');
+      root.classList.remove('hidden');
+      root.innerHTML = `
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm animate-fade flex items-end sm:items-center justify-center" onclick="if(event.target===this) closeModal()">
+          <div class="w-full max-w-[480px] max-h-[92vh] overflow-y-auto rounded-t-[28px] sm:rounded-[28px] bg-[#151924] border-t sm:border border-white/10 shadow-2xl animate-sheet" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+            <div class="flex justify-center pt-2.5 pb-1 sm:hidden">
+              <div class="w-10 h-1 rounded-full bg-white/20"></div>
+            </div>
+            ${innerHtml}
+          </div>
+        </div>
+      `;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const root = document.getElementById('modal-root');
+      root.classList.add('hidden');
+      root.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    /* =========================================================================
+       МОДАЛКА: + ПРОДАЖА (МАКСИМАЛЬНО БЫСТРЫЙ ВВОД)
+       ========================================================================= */
+
+    const saleForm = {
+      clientId: null,
+      newClientName: '',
+      qty: 3,
+      applyPromo: true,
+      manualPrice: null,
+      date: todayStr(),
+      note: ''
+    };
+
+    function openSaleModal(preselectClientId = null, preselectQty = null) {
+      saleForm.clientId = preselectClientId;
+      saleForm.newClientName = preselectClientId ? (getClientById(preselectClientId)?.name || '') : '';
+      saleForm.qty = preselectQty || 3;
+      saleForm.manualPrice = null;
+      saleForm.date = todayStr();
+      saleForm.note = '';
+
+      // Автоматически определяем новичок или постоянный
+      syncPromoByClient();
+      renderSaleModal();
+    }
+
+    function syncPromoByClient() {
+      if (saleForm.clientId) {
+        const pastOrders = getClientSales(saleForm.clientId).length;
+        saleForm.applyPromo = pastOrders === 0;
+      } else {
+        // Проверяем, не совпадает ли введенное имя с существующим клиентом
+        const trimmed = saleForm.newClientName.trim().toLowerCase();
+        const match = trimmed ? appData.clients.find(c => c.name.trim().toLowerCase() === trimmed) : null;
+        if (match) {
+          saleForm.clientId = match.id;
+          saleForm.applyPromo = getClientSales(match.id).length === 0;
+        } else {
+          saleForm.applyPromo = true;
+        }
+      }
+    }
+
+    function renderSaleModal() {
+      // Популярные клиенты для чипсов (по числу заказов / последнему заказу)
+      const topClients = [...appData.clients]
+        .sort((a, b) => getClientSales(b.id).length - getClientSales(a.id).length)
+        .slice(0, 8);
+
+      const pastOrders = saleForm.clientId ? getClientSales(saleForm.clientId).length : 0;
+      const isNewClient = pastOrders === 0;
+      const autoPrice = calculateSalePrice(saleForm.qty, saleForm.applyPromo);
+      const finalPrice = saleForm.manualPrice !== null ? saleForm.manualPrice : autoPrice;
+      const pocketPct = appData.settings.pocketPercent;
+      const pocketShare = Math.round(finalPrice * (pocketPct / 100));
+      const fundShare = finalPrice - pocketShare;
+      const stockAfter = appData.inventory.freezerStock - saleForm.qty;
+      const savings = (saleForm.applyPromo && saleForm.qty >= 3)
+        ? (appData.settings.unitPrice * 3 - appData.settings.promo3Price)
+        : 0;
+
+      const tStr = todayStr();
+      const yStr = daysAgoStr(1);
+
+      openSheetModal(`
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white">Новая продажа</h2>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-400">✕</button>
+          </div>
+
+          <!-- Клиент -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-400">Клиент</label>
+              <span id="sale-client-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                isNewClient ? 'bg-[#FF6B4A]/15 text-[#FF6B4A]' : 'bg-[#22C55E]/15 text-[#22C55E]'
+              }">
+                ${isNewClient ? '✨ Новый клиент' : `⭐ Постоянный (${pastOrders} зак.)`}
+              </span>
+            </div>
+
+            <input id="sale-client-input" type="text" value="${escapeHtml(saleForm.newClientName)}" oninput="onSaleClientInput(this.value)" placeholder="Имя нового клиента или выберите ниже..." class="w-full px-3.5 py-3 rounded-2xl bg-black/35 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF6B4A]" />
+
+            ${topClients.length > 0 ? `
+              <div class="flex gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+                ${topClients.map(c => {
+                  const selected = saleForm.clientId === c.id;
+                  return `<button type="button" onclick="selectSaleClient('${c.id}')" class="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border transition ${
+                    selected ? 'bg-[#FF6B4A] border-[#FF6B4A] text-white' : 'bg-white/[0.05] border-white/[0.08] text-slate-300'
+                  }">${escapeHtml(c.name.split(' ')[0])}</button>`;
+                }).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Количество -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-400">Количество упаковок (300 г)</label>
+              <span id="sale-weight-hint" class="text-xs text-slate-400 tnum">${(saleForm.qty * 0.3).toFixed(1)} кг</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="changeSaleQty(-1)" class="w-12 h-12 rounded-2xl bg-white/[0.07] border border-white/10 text-xl font-bold text-white active:scale-90 transition">−</button>
+              <input id="sale-qty-input" type="number" min="1" value="${saleForm.qty}" oninput="setSaleQty(Number(this.value)||1)" class="flex-1 h-12 text-center rounded-2xl bg-black/35 border border-white/10 text-xl font-extrabold text-white tnum focus:outline-none focus:border-[#FF6B4A]" />
+              <button type="button" onclick="changeSaleQty(1)" class="w-12 h-12 rounded-2xl bg-white/[0.07] border border-white/10 text-xl font-bold text-white active:scale-90 transition">+</button>
+            </div>
+
+            <div class="grid grid-cols-6 gap-1.5">
+              ${[1, 3, 5, 10, 15, 20].map(q => `
+                <button type="button" onclick="setSaleQty(${q})" class="sale-qty-chip py-2 rounded-xl text-xs font-bold border tnum transition ${
+                  saleForm.qty === q ? 'bg-[#FF6B4A]/20 border-[#FF6B4A] text-[#FF6B4A]' : 'bg-white/[0.04] border-white/[0.08] text-slate-300'
+                }">${q}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Тумблер скидки первого заказа -->
+          <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold text-white">Скидка новичка (3 за ${appData.settings.promo3Price} ₽)</p>
+              <p id="sale-promo-sub" class="text-[11px] text-slate-400 mt-0.5">
+                ${saleForm.qty < 3 ? 'Действует при заказе от 3 штук' : (saleForm.applyPromo ? `Применена к первым 3 шт (скидка ${savings} ₽)` : 'Отключена — по базовой цене')}
+              </p>
+            </div>
+            <button type="button" id="sale-promo-toggle" onclick="toggleSalePromo()" class="w-12 h-7 rounded-full p-1 transition-colors shrink-0 ${saleForm.applyPromo ? 'bg-[#FF6B4A]' : 'bg-white/15'}">
+              <div class="w-5 h-5 rounded-full bg-white shadow transition-transform ${saleForm.applyPromo ? 'translate-x-5' : 'translate-x-0'}"></div>
+            </button>
+          </div>
+
+          <!-- Итоговая сумма (можно редактировать вручную) -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-400">Сумма к оплате (₽)</label>
+              <input id="sale-price-input" type="number" min="0" value="${finalPrice}" oninput="onSalePriceManual(this.value)" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-base font-extrabold text-white tnum focus:outline-none focus:border-[#FF6B4A]" />
+            </div>
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-400">Дата продажи</label>
+              <div class="flex gap-1">
+                <button type="button" onclick="setSaleDate('${tStr}')" class="flex-1 py-2.5 rounded-xl text-[11px] font-bold border ${saleForm.date === tStr ? 'bg-white/15 border-white/25 text-white' : 'bg-white/[0.04] border-white/[0.07] text-slate-400'}">Сег.</button>
+                <button type="button" onclick="setSaleDate('${yStr}')" class="flex-1 py-2.5 rounded-xl text-[11px] font-bold border ${saleForm.date === yStr ? 'bg-white/15 border-white/25 text-white' : 'bg-white/[0.04] border-white/[0.07] text-slate-400'}">Вчера</button>
+                <input type="date" value="${saleForm.date}" onchange="setSaleDate(this.value)" class="w-10 px-1 rounded-xl bg-white/[0.05] border border-white/10 text-[11px] text-white" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Превью распределения и остатка -->
+          <div id="sale-preview-box" class="p-3.5 rounded-2xl bg-black/30 border border-white/[0.06] grid grid-cols-3 gap-2 text-center tnum">
+            <div>
+              <p class="text-[10px] text-slate-400">В карман (${pocketPct}%)</p>
+              <p class="text-xs font-bold text-[#22C55E] mt-0.5">+${formatRub(pocketShare)}</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400">В фонд (${100 - pocketPct}%)</p>
+              <p class="text-xs font-bold text-slate-200 mt-0.5">+${formatRub(fundShare)}</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400">В морозилке</p>
+              <p class="text-xs font-bold mt-0.5 ${stockAfter < 0 ? 'text-rose-400' : 'text-[#38BDF8]'}">${stockAfter} шт</p>
+            </div>
+          </div>
+
+          <button id="sale-submit-btn" onclick="submitSale()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF6B4A] to-[#F43F5E] text-white font-extrabold text-sm shadow-xl shadow-[#FF6B4A]/25 active:scale-[0.98] transition tnum">
+            Записать продажу • ${formatRub(finalPrice)}
+          </button>
+        </div>
+      `);
+    }
+
+    function selectSaleClient(clientId) {
+      const c = getClientById(clientId);
+      if (!c) return;
+      saleForm.clientId = c.id;
+      saleForm.newClientName = c.name;
+      saleForm.manualPrice = null;
+      syncPromoByClient();
+      renderSaleModal();
+    }
+
+    function onSaleClientInput(val) {
+      saleForm.newClientName = val;
+      const trimmed = val.trim().toLowerCase();
+      const match = trimmed ? appData.clients.find(c => c.name.trim().toLowerCase() === trimmed) : null;
+      saleForm.clientId = match ? match.id : null;
+      saleForm.manualPrice = null;
+      syncPromoByClient();
+      updateSaleModalDynamicFields();
+    }
+
+    function setSaleQty(q) {
+      saleForm.qty = Math.max(1, Math.min(500, Math.round(q)));
+      saleForm.manualPrice = null;
+      renderSaleModal();
+    }
+
+    function changeSaleQty(delta) {
+      setSaleQty(saleForm.qty + delta);
+    }
+
+    function toggleSalePromo() {
+      saleForm.applyPromo = !saleForm.applyPromo;
+      saleForm.manualPrice = null;
+      renderSaleModal();
+    }
+
+    function setSaleDate(d) {
+      if (!d) return;
+      saleForm.date = d;
+      renderSaleModal();
+    }
+
+    function onSalePriceManual(val) {
+      const num = Number(val);
+      saleForm.manualPrice = isNaN(num) ? 0 : Math.max(0, num);
+      updateSaleModalDynamicFields();
+    }
+
+    function updateSaleModalDynamicFields() {
+      const pastOrders = saleForm.clientId ? getClientSales(saleForm.clientId).length : 0;
+      const isNewClient = pastOrders === 0;
+      const autoPrice = calculateSalePrice(saleForm.qty, saleForm.applyPromo);
+      const finalPrice = saleForm.manualPrice !== null ? saleForm.manualPrice : autoPrice;
+      const pocketPct = appData.settings.pocketPercent;
+      const pocketShare = Math.round(finalPrice * (pocketPct / 100));
+      const fundShare = finalPrice - pocketShare;
+      const stockAfter = appData.inventory.freezerStock - saleForm.qty;
+      const savings = (saleForm.applyPromo && saleForm.qty >= 3)
+        ? (appData.settings.unitPrice * 3 - appData.settings.promo3Price)
+        : 0;
+
+      const badge = document.getElementById('sale-client-badge');
+      if (badge) {
+        badge.className = `text-[11px] font-semibold px-2 py-0.5 rounded-full ${isNewClient ? 'bg-[#FF6B4A]/15 text-[#FF6B4A]' : 'bg-[#22C55E]/15 text-[#22C55E]'}`;
+        badge.textContent = isNewClient ? '✨ Новый клиент' : `⭐ Постоянный (${pastOrders} зак.)`;
+      }
+
+      const toggle = document.getElementById('sale-promo-toggle');
+      if (toggle) {
+        toggle.className = `w-12 h-7 rounded-full p-1 transition-colors shrink-0 ${saleForm.applyPromo ? 'bg-[#FF6B4A]' : 'bg-white/15'}`;
+        toggle.firstElementChild.className = `w-5 h-5 rounded-full bg-white shadow transition-transform ${saleForm.applyPromo ? 'translate-x-5' : 'translate-x-0'}`;
+      }
+
+      const promoSub = document.getElementById('sale-promo-sub');
+      if (promoSub) {
+        promoSub.textContent = saleForm.qty < 3
+          ? 'Действует при заказе от 3 штук'
+          : (saleForm.applyPromo ? `Применена к первым 3 шт (скидка ${savings} ₽)` : 'Отключена — по базовой цене');
+      }
+
+      const priceInput = document.getElementById('sale-price-input');
+      if (priceInput && saleForm.manualPrice === null) {
+        priceInput.value = finalPrice;
+      }
+
+      const preview = document.getElementById('sale-preview-box');
+      if (preview) {
+        preview.innerHTML = `
+          <div>
+            <p class="text-[10px] text-slate-400">В карман (${pocketPct}%)</p>
+            <p class="text-xs font-bold text-[#22C55E] mt-0.5">+${formatRub(pocketShare)}</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-400">В фонд (${100 - pocketPct}%)</p>
+            <p class="text-xs font-bold text-slate-200 mt-0.5">+${formatRub(fundShare)}</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-400">В морозилке</p>
+            <p class="text-xs font-bold mt-0.5 ${stockAfter < 0 ? 'text-rose-400' : 'text-[#38BDF8]'}">${stockAfter} шт</p>
+          </div>
+        `;
+      }
+
+      const btn = document.getElementById('sale-submit-btn');
+      if (btn) btn.textContent = `Записать продажу • ${formatRub(finalPrice)}`;
+    }
+
+    function submitSale() {
+      const name = saleForm.newClientName.trim();
+      if (!name) {
+        showToast('Укажите имя клиента', 'warning');
+        return;
+      }
+
+      let clientId = saleForm.clientId;
+      if (!clientId) {
+        const existing = appData.clients.find(c => c.name.trim().toLowerCase() === name.toLowerCase());
+        if (existing) {
+          clientId = existing.id;
+        } else {
+          clientId = genId('c');
+          appData.clients.push({
+            id: clientId,
+            name,
+            contact: 'Авито',
+            dailyRateOverride: null,
+            notes: ''
+          });
+        }
+      }
+
+      const qty = Math.max(1, Number(saleForm.qty) || 1);
+      const autoPrice = calculateSalePrice(qty, saleForm.applyPromo);
+      const totalPrice = saleForm.manualPrice !== null ? saleForm.manualPrice : autoPrice;
+      const pocketPct = appData.settings.pocketPercent;
+      const pocketShare = Math.round(totalPrice * (pocketPct / 100));
+      const fundShare = totalPrice - pocketShare;
+
+      appData.sales.push({
+        id: genId('s'),
+        date: saleForm.date || todayStr(),
+        clientId,
+        qty,
+        isPromoApplied: Boolean(saleForm.applyPromo && qty >= 3),
+        totalPrice,
+        pocketShare,
+        fundShare,
+        note: ''
+      });
+
+      appData.inventory.freezerStock -= qty;
+      saveData();
+      closeModal();
+      renderAll();
+      showToast(`Продажа на ${formatRub(totalPrice)} записана! В карман +${formatRub(pocketShare)}`, 'success');
+    }
+
+    function confirmDeleteSale(saleId) {
+      const s = appData.sales.find(x => x.id === saleId);
+      if (!s) return;
+      openConfirmModal({
+        title: 'Удалить продажу?',
+        message: `Сумма ${formatRub(s.totalPrice)} будет убрана из статистики, а ${s.qty} шт вернутся обратно в морозилку.`,
+        confirmText: 'Удалить',
+        danger: true,
+        onConfirm: () => {
+          appData.sales = appData.sales.filter(x => x.id !== saleId);
+          appData.inventory.freezerStock += s.qty;
+          saveData();
+          renderAll();
+          showToast('Продажа удалена, остаток восстановлен', 'info');
+        }
+      });
+    }
+
+    /* =========================================================================
+       МОДАЛКА: + ЗАКУПКА (ПАРТИЯ МЯСА ИЛИ ТАРА ОТДЕЛЬНО)
+       ========================================================================= */
+
+    const purchaseForm = {
+      tab: 'meat', // 'meat' | 'containers'
+      meatCost: '',
+      qtyProduced: '',
+      weightKg: '',
+      containersCost: 0,
+      containersBought: '',
+      date: todayStr(),
+      note: ''
+    };
+
+    function openPurchaseModal(initialTab = 'meat') {
+      purchaseForm.tab = initialTab;
+      purchaseForm.meatCost = '';
+      purchaseForm.qtyProduced = '';
+      purchaseForm.weightKg = '';
+      purchaseForm.containersCost = '';
+      purchaseForm.containersBought = '';
+      purchaseForm.date = todayStr();
+      purchaseForm.note = '';
+      renderPurchaseModal();
+    }
+
+    function renderPurchaseModal() {
+      const isMeat = purchaseForm.tab === 'meat';
+      const tStr = todayStr();
+      const yStr = daysAgoStr(1);
+
+      openSheetModal(`
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white">Новая закупка</h2>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-400">✕</button>
+          </div>
+
+          <!-- Табы внутри модалки -->
+          <div class="grid grid-cols-2 p-1 rounded-2xl bg-black/35 border border-white/[0.06] text-xs font-bold">
+            <button onclick="purchaseForm.tab='meat'; renderPurchaseModal()" class="py-2.5 rounded-xl transition ${isMeat ? 'bg-[#22C55E] text-slate-950' : 'text-slate-400'}">🥩 Партия корма</button>
+            <button onclick="purchaseForm.tab='containers'; renderPurchaseModal()" class="py-2.5 rounded-xl transition ${!isMeat ? 'bg-[#38BDF8] text-slate-950' : 'text-slate-400'}">📦 Тара / Расходы</button>
+          </div>
+
+          ${isMeat ? `
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">Потратил на мясо (₽)</label>
+                  <input id="p-meat-cost" type="number" min="0" value="${purchaseForm.meatCost}" oninput="purchaseForm.meatCost=this.value; updatePurchaseUnitPreview()" placeholder="5000" class="w-full px-3.5 py-3 rounded-2xl bg-black/35 border border-white/10 text-base font-bold text-white tnum focus:outline-none focus:border-[#22C55E]" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">Получилось банок (шт)</label>
+                  <input id="p-qty" type="number" min="1" value="${purchaseForm.qtyProduced}" oninput="purchaseForm.qtyProduced=this.value; updatePurchaseUnitPreview()" placeholder="38" class="w-full px-3.5 py-3 rounded-2xl bg-black/35 border border-white/10 text-base font-bold text-white tnum focus:outline-none focus:border-[#22C55E]" />
+                </div>
+              </div>
+
+              <!-- Живой расчет себестоимости -->
+              <div id="p-unit-preview" class="p-3.5 rounded-2xl bg-black/30 border border-white/[0.06] flex items-center justify-between text-xs tnum">
+                <span class="text-slate-400">Введите сумму и кол-во банок для расчета себестоимости</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">Вес мяса, кг (опц.)</label>
+                  <input id="p-weight" type="number" step="0.1" min="0" value="${purchaseForm.weightKg}" oninput="purchaseForm.weightKg=this.value" placeholder="авто: шт × 0.3" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white tnum focus:outline-none focus:border-[#22C55E]" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">На контейнеры (₽, опц.)</label>
+                  <input id="p-cont-cost" type="number" min="0" value="${purchaseForm.containersCost}" oninput="purchaseForm.containersCost=this.value; updatePurchaseUnitPreview()" placeholder="0" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white tnum focus:outline-none focus:border-[#38BDF8]" />
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[11px] font-semibold text-slate-400">Куплено пустых контейнеров в этот раз (шт, опц.)</label>
+                <input type="number" min="0" value="${purchaseForm.containersBought}" oninput="purchaseForm.containersBought=this.value" placeholder="Если тару не брали — оставьте пустым" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white tnum focus:outline-none focus:border-[#38BDF8]" />
+              </div>
+            </div>
+          ` : `
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">Сумма расхода (₽)</label>
+                  <input type="number" min="0" value="${purchaseForm.containersCost}" oninput="purchaseForm.containersCost=this.value" placeholder="890" class="w-full px-3.5 py-3 rounded-2xl bg-black/35 border border-white/10 text-base font-bold text-white tnum focus:outline-none focus:border-[#38BDF8]" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-400">Кол-во тары (шт, опц.)</label>
+                  <input type="number" min="0" value="${purchaseForm.containersBought}" oninput="purchaseForm.containersBought=this.value" placeholder="100" class="w-full px-3.5 py-3 rounded-2xl bg-black/35 border border-white/10 text-base font-bold text-white tnum focus:outline-none focus:border-[#38BDF8]" />
+                </div>
+              </div>
+            </div>
+          `}
+
+          <!-- Комментарий и дата -->
+          <div class="space-y-2.5">
+            <input type="text" value="${escapeHtml(purchaseForm.note)}" oninput="purchaseForm.note=this.value" placeholder="${isMeat ? 'Комментарий (напр. рынок, акции...)' : 'Комментарий (напр. контейнеры 300 мл WB)'}" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-white/30" />
+
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="purchaseForm.date='${tStr}'; renderPurchaseModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold border ${purchaseForm.date === tStr ? 'bg-white/15 border-white/25 text-white' : 'bg-white/[0.04] border-white/[0.07] text-slate-400'}">Сегодня</button>
+              <button type="button" onclick="purchaseForm.date='${yStr}'; renderPurchaseModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold border ${purchaseForm.date === yStr ? 'bg-white/15 border-white/25 text-white' : 'bg-white/[0.04] border-white/[0.07] text-slate-400'}">Вчера</button>
+              <input type="date" value="${purchaseForm.date}" onchange="purchaseForm.date=this.value; renderPurchaseModal()" class="px-2.5 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white" />
+            </div>
+          </div>
+
+          <button onclick="submitPurchase()" class="w-full py-4 rounded-2xl font-extrabold text-sm active:scale-[0.98] transition ${isMeat ? 'bg-[#22C55E] text-slate-950 shadow-xl shadow-[#22C55E]/20' : 'bg-[#38BDF8] text-slate-950 shadow-xl shadow-[#38BDF8]/20'}">
+            ${isMeat ? 'Добавить партию в морозилку' : 'Записать расход'}
+          </button>
+        </div>
+      `);
+      if (isMeat) updatePurchaseUnitPreview();
+    }
+
+    function updatePurchaseUnitPreview() {
+      const box = document.getElementById('p-unit-preview');
+      const wInput = document.getElementById('p-weight');
+      const meatCost = Number(purchaseForm.meatCost) || 0;
+      const qty = Number(purchaseForm.qtyProduced) || 0;
+
+      if (wInput && qty > 0) {
+        wInput.placeholder = `~${(qty * 0.3).toFixed(1)} кг`;
+      }
+
+      if (!box) return;
+      if (meatCost > 0 && qty > 0) {
+        const unitCost = Math.round(meatCost / qty);
+        const margin = appData.settings.unitPrice - unitCost;
+        const marginPct = Math.round((margin / appData.settings.unitPrice) * 100);
+        box.innerHTML = `
+          <div>
+            <p class="text-[10px] text-slate-400">Себестоимость мяса</p>
+            <p class="text-sm font-extrabold text-white">${unitCost} ₽ / шт</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] text-slate-400">Маржа с банки (${appData.settings.unitPrice} ₽)</p>
+            <p class="text-sm font-extrabold ${margin >= 0 ? 'text-[#22C55E]' : 'text-rose-400'}">${margin >= 0 ? '+' : ''}${margin} ₽ (${marginPct}%)</p>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `<span class="text-slate-400">Введите сумму на мясо и кол-во банок для расчета маржи</span>`;
+      }
+    }
+
+    function submitPurchase() {
+      if (purchaseForm.tab === 'meat') {
+        const meatCost = Number(purchaseForm.meatCost) || 0;
+        const qtyProduced = Math.round(Number(purchaseForm.qtyProduced) || 0);
+        const containersCost = Number(purchaseForm.containersCost) || 0;
+        const containersBought = Math.round(Number(purchaseForm.containersBought) || 0);
+        const weightKg = Number(purchaseForm.weightKg) || Number((qtyProduced * 0.3).toFixed(1));
+
+        if (meatCost <= 0 || qtyProduced <= 0) {
+          showToast('Укажите сумму на мясо и количество получившихся банок', 'warning');
+          return;
+        }
+
+        appData.purchases.push({
+          id: genId('p'),
+          type: 'meat',
+          date: purchaseForm.date || todayStr(),
+          meatCost,
+          containersCost,
+          qtyProduced,
+          weightKg,
+          containersBought,
+          note: purchaseForm.note.trim()
+        });
+
+        appData.inventory.freezerStock += qtyProduced;
+        appData.inventory.emptyContainers = Math.max(0, appData.inventory.emptyContainers + containersBought - qtyProduced);
+
+        saveData();
+        closeModal();
+        renderAll();
+        showToast(`Партия +${qtyProduced} шт добавлена! Себестоимость ${Math.round(meatCost / qtyProduced)} ₽/шт`, 'success');
+      } else {
+        const containersCost = Number(purchaseForm.containersCost) || 0;
+        const containersBought = Math.round(Number(purchaseForm.containersBought) || 0);
+        if (containersCost <= 0) {
+          showToast('Укажите сумму расхода', 'warning');
+          return;
+        }
+
+        appData.purchases.push({
+          id: genId('p'),
+          type: 'containers',
+          date: purchaseForm.date || todayStr(),
+          meatCost: 0,
+          containersCost,
+          qtyProduced: 0,
+          weightKg: 0,
+          containersBought,
+          note: purchaseForm.note.trim() || 'Контейнеры / прочее'
+        });
+
+        if (containersBought > 0) {
+          appData.inventory.emptyContainers += containersBought;
+        }
+
+        saveData();
+        closeModal();
+        renderAll();
+        showToast(`Расход ${formatRub(containersCost)} записан`, 'success');
+      }
+    }
+
+    function confirmDeletePurchase(purchaseId) {
+      const p = appData.purchases.find(x => x.id === purchaseId);
+      if (!p) return;
+      openConfirmModal({
+        title: 'Удалить закупку?',
+        message: p.type === 'meat'
+          ? `Из морозилки будет вычтено ${p.qtyProduced} шт, а расход ${formatRub((p.meatCost || 0) + (p.containersCost || 0))} убран из фонда.`
+          : `Расход ${formatRub(p.containersCost)} будет удален из истории.`,
+        confirmText: 'Удалить',
+        danger: true,
+        onConfirm: () => {
+          if (p.type === 'meat') {
+            appData.inventory.freezerStock = Math.max(0, appData.inventory.freezerStock - (p.qtyProduced || 0));
+            appData.inventory.emptyContainers = Math.max(0, appData.inventory.emptyContainers + (p.qtyProduced || 0) - (p.containersBought || 0));
+          } else if (p.containersBought > 0) {
+            appData.inventory.emptyContainers = Math.max(0, appData.inventory.emptyContainers - p.containersBought);
+          }
+          appData.purchases = appData.purchases.filter(x => x.id !== purchaseId);
+          saveData();
+          renderAll();
+          showToast('Закупка удалена', 'info');
+        }
+      });
+    }
+
+    /* =========================================================================
+       МОДАЛКА: МОРОЗИЛКА И БЫСТРОЕ СПИСАНИЕ КОШКЕ
+       ========================================================================= */
+
+    function feedOwnCat() {
+      if (appData.inventory.freezerStock <= 0) {
+        showToast('В морозилке уже 0 шт — сначала скорректируйте остаток', 'warning');
+        return;
+      }
+      appData.inventory.freezerStock -= 1;
+      appData.inventory.catConsumed = (appData.inventory.catConsumed || 0) + 1;
+      saveData();
+      renderAll();
+      showToast(`Списана 1 банка для вашей кошки 🐾 (осталось ${appData.inventory.freezerStock} шт)`, 'info', {
+        label: 'Отменить',
+        onClick: () => {
+          appData.inventory.freezerStock += 1;
+          appData.inventory.catConsumed = Math.max(0, (appData.inventory.catConsumed || 1) - 1);
+          saveData();
+          renderAll();
+          showToast('Списание отменено', 'info');
+        }
+      });
+    }
+
+    function openStockModal(isFreshStart = false) {
+      openSheetModal(`
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-extrabold text-white">${isFreshStart ? 'Стартовый остаток' : 'Морозилка и тара'}</h2>
+              <p class="text-xs text-slate-400 mt-0.5">${isFreshStart ? 'Введите сколько банок прямо сейчас лежит в морозилке' : 'Установите фактическое количество'}</p>
+            </div>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-400">✕</button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-[#38BDF8]">Готового корма в морозилке (шт по 300 г)</label>
+              <input id="stock-freezer-input" type="number" min="0" value="${appData.inventory.freezerStock}" class="w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-[#38BDF8]/30 text-2xl font-extrabold text-white tnum text-center focus:outline-none focus:border-[#38BDF8]" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-400">Пустых контейнеров в запасе (шт, опц.)</label>
+              <input id="stock-empty-input" type="number" min="0" value="${appData.inventory.emptyContainers}" class="w-full px-4 py-3 rounded-2xl bg-black/35 border border-white/10 text-base font-bold text-white tnum text-center focus:outline-none focus:border-white/30" />
+            </div>
+
+            ${!isFreshStart ? `
+              <div class="p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-between text-xs">
+                <span class="text-slate-400">Всего съела ваша кошка:</span>
+                <span class="font-bold text-slate-200 tnum">${appData.inventory.catConsumed || 0} шт 🐾</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <button onclick="saveStockAdjust()" class="w-full py-4 rounded-2xl bg-[#38BDF8] text-slate-950 font-extrabold text-sm shadow-lg shadow-[#38BDF8]/20 active:scale-[0.98] transition">
+            Сохранить остаток
+          </button>
+        </div>
+      `);
+      setTimeout(() => {
+        const inp = document.getElementById('stock-freezer-input');
+        if (inp) { inp.focus(); inp.select(); }
+      }, 120);
+    }
+
+    function saveStockAdjust() {
+      const fVal = Math.max(0, Math.round(Number(document.getElementById('stock-freezer-input').value) || 0));
+      const eVal = Math.max(0, Math.round(Number(document.getElementById('stock-empty-input').value) || 0));
+      appData.inventory.freezerStock = fVal;
+      appData.inventory.emptyContainers = eVal;
+      saveData();
+      closeModal();
+      renderAll();
+      showToast(`В морозилке теперь ${fVal} шт (${(fVal * 0.3).toFixed(1)} кг)`, 'success');
+    }
+
+    /* =========================================================================
+       МОДАЛКА: КАРТОЧКА КЛИЕНТА (РЕДАКТИРОВАНИЕ И ИСТОРИЯ)
+       ========================================================================= */
+
+    function openClientDetailModal(clientId) {
+      const isNew = !clientId;
+      const client = isNew
+        ? { id: null, name: '', contact: 'Авито', dailyRateOverride: null, notes: '' }
+        : getClientById(clientId);
+      if (!client) return;
+
+      const forecast = isNew ? null : computeClientForecast(client);
+      const history = isNew ? [] : getClientSales(client.id).reverse();
+
+      openSheetModal(`
+        <div class="p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white">${isNew ? 'Новый клиент' : 'Карточка клиента'}</h2>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-400">✕</button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-400">Имя / Питомец</label>
+              <input id="cd-name" type="text" value="${escapeHtml(client.name)}" placeholder="Например: Анна (Мейн-кун)" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white focus:outline-none focus:border-[#F59E0B]" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="space-y-1">
+                <label class="text-[11px] font-semibold text-slate-400">Контакт / Район</label>
+                <input id="cd-contact" type="text" value="${escapeHtml(client.contact || '')}" placeholder="Авито / Telegram" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white focus:outline-none focus:border-[#F59E0B]" />
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] font-semibold text-slate-400">Расход (банок/день)</label>
+                <input id="cd-rate" type="number" step="0.25" min="0.2" max="10" value="${client.dailyRateOverride ?? ''}" placeholder="Авто (1.0)" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white tnum focus:outline-none focus:border-[#F59E0B]" />
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500 -mt-1.5">Оставьте «Расход» пустым для авто-прогноза по истории заказов, или укажите (напр. 2 если два кота).</p>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-slate-400">Заметка</label>
+              <input id="cd-notes" type="text" value="${escapeHtml(client.notes || '')}" placeholder="Предпочтения, время самовывоза..." class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm text-white focus:outline-none focus:border-[#F59E0B]" />
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="saveClientDetail('${client.id || ''}')" class="flex-1 py-3.5 rounded-2xl bg-[#FF6B4A] text-white font-bold text-sm active:scale-95 transition">Сохранить</button>
+            ${!isNew ? `<button onclick="confirmDeleteClient('${client.id}')" class="px-4 py-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-bold active:scale-95 transition">Удалить</button>` : ''}
+          </div>
+
+          ${!isNew && history.length > 0 ? `
+            <div class="pt-2 border-t border-white/[0.08] space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-300">История заказов (${history.length})</span>
+                <span class="text-slate-400 tnum">Всего: ${forecast.totalQty} шт • ${formatRub(forecast.totalSpent)}</span>
+              </div>
+              <div class="max-h-44 overflow-y-auto space-y-1.5">
+                ${history.map(s => `
+                  <div class="px-3 py-2 rounded-xl bg-black/30 flex items-center justify-between text-xs tnum">
+                    <span class="text-slate-300">${formatDateFull(s.date)}</span>
+                    <span class="font-bold text-white">${s.qty} шт — ${formatRub(s.totalPrice)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `);
+    }
+
+    function saveClientDetail(clientId) {
+      const name = document.getElementById('cd-name').value.trim();
+      const contact = document.getElementById('cd-contact').value.trim();
+      const rateRaw = document.getElementById('cd-rate').value.trim();
+      const notes = document.getElementById('cd-notes').value.trim();
+
+      if (!name) {
+        showToast('Введите имя клиента', 'warning');
+        return;
+      }
+
+      const dailyRateOverride = rateRaw !== '' && Number(rateRaw) > 0 ? Number(rateRaw) : null;
+
+      if (clientId) {
+        const c = getClientById(clientId);
+        if (c) {
+          c.name = name;
+          c.contact = contact;
+          c.dailyRateOverride = dailyRateOverride;
+          c.notes = notes;
+        }
+      } else {
+        appData.clients.push({
+          id: genId('c'),
+          name,
+          contact,
+          dailyRateOverride,
+          notes
+        });
+      }
+
+      saveData();
+      closeModal();
+      renderAll();
+      showToast('Данные клиента сохранены', 'success');
+    }
+
+    function confirmDeleteClient(clientId) {
+      const c = getClientById(clientId);
+      if (!c) return;
+      openConfirmModal({
+        title: `Удалить клиента «${c.name}»?`,
+        message: 'Карточка клиента будет удалена. Прошлые продажи останутся в финансовой статистике.',
+        confirmText: 'Удалить',
+        danger: true,
+        onConfirm: () => {
+          appData.clients = appData.clients.filter(x => x.id !== clientId);
+          saveData();
+          renderAll();
+          showToast('Клиент удален', 'info');
+        }
+      });
+    }
+
+    /* =========================================================================
+       МОДАЛКА: НАСТРОЙКИ, БЭКАП JSON И СБРОС ДЕМО
+       ========================================================================= */
+
+    function openSettingsModal() {
+      const s = appData.settings;
+      openSheetModal(`
+        <div class="p-5 space-y-5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white">Настройки и бэкап</h2>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-400">✕</button>
+          </div>
+
+          <!-- Цены и распределение -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Цены и распределение</h3>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="space-y-1">
+                <label class="text-[11px] text-slate-400">Цена 1 банки (₽)</label>
+                <input id="set-unit-price" type="number" min="1" value="${s.unitPrice}" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm font-bold text-white tnum" />
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] text-slate-400">Акция 3 шт (₽)</label>
+                <input id="set-promo-price" type="number" min="1" value="${s.promo3Price}" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm font-bold text-white tnum" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="space-y-1">
+                <label class="text-[11px] text-slate-400">Доля «В карман» (%)</label>
+                <input id="set-pocket-pct" type="number" min="0" max="100" value="${s.pocketPercent}" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm font-bold text-white tnum" />
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] text-slate-400">Стартовый фонд (₽)</label>
+                <input id="set-start-fund" type="number" value="${s.startingFund}" class="w-full px-3.5 py-2.5 rounded-2xl bg-black/35 border border-white/10 text-sm font-bold text-white tnum" />
+              </div>
+            </div>
+
+            <button onclick="saveSettingsForm()" class="w-full py-3 rounded-2xl bg-[#FF6B4A] text-white font-bold text-xs active:scale-95 transition">
+              Сохранить настройки
+            </button>
+          </div>
+
+          <!-- Бэкап данных -->
+          <div class="space-y-2.5 pt-3 border-t border-white/[0.08]">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Резервная копия (JSON)</h3>
+            <p class="text-[11px] text-slate-400 leading-snug">Данные хранятся локально на вашем iPhone. Периодически сохраняйте копию в Файлы iCloud.</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="exportJsonBackup()" class="py-3 px-3 rounded-2xl bg-white/[0.07] border border-white/10 text-xs font-bold text-white active:scale-95 transition">
+                ⬇ Скачать JSON
+              </button>
+              <button onclick="triggerJsonImport()" class="py-3 px-3 rounded-2xl bg-white/[0.07] border border-white/10 text-xs font-bold text-[#38BDF8] active:scale-95 transition">
+                ⬆ Импорт JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Управление данными -->
+          <div class="space-y-2 pt-3 border-t border-white/[0.08]">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Управление базой</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="confirmLoadDemo()" class="py-2.5 px-3 rounded-2xl bg-[#F59E0B]/12 border border-[#F59E0B]/25 text-xs font-semibold text-[#F59E0B] active:scale-95 transition">
+                Загрузить демо
+              </button>
+              <button onclick="promptStartFresh()" class="py-2.5 px-3 rounded-2xl bg-rose-500/12 border border-rose-500/25 text-xs font-semibold text-rose-300 active:scale-95 transition">
+                Очистить всё
+              </button>
+            </div>
+          </div>
+
+          <!-- Памятка для iPhone -->
+          <details class="rounded-2xl bg-black/30 border border-white/[0.06] p-3 text-xs text-slate-400">
+            <summary class="font-semibold text-slate-200 cursor-pointer">📱 Как установить как приложение на iPhone</summary>
+            <ol class="mt-2 space-y-1.5 list-decimal list-inside leading-relaxed">
+              <li>Загрузите этот файл <code class="text-slate-200">index.html</code> в репозиторий GitHub и включите <b>GitHub Pages</b> (Settings → Pages → Branch: main).</li>
+              <li>Откройте полученную ссылку в <b>Safari</b> на iPhone.</li>
+              <li>Нажмите кнопку <b>«Поделиться»</b> (квадрат со стрелкой вверх) → <b>«На экран „Домой“»</b>.</li>
+            </ol>
+          </details>
+        </div>
+      `);
+    }
+
+    function saveSettingsForm() {
+      const unitPrice = Math.max(1, Math.round(Number(document.getElementById('set-unit-price').value) || 210));
+      const promo3Price = Math.max(1, Math.round(Number(document.getElementById('set-promo-price').value) || 550));
+      const pocketPercent = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('set-pocket-pct').value) ?? 50)));
+      const startingFund = Math.round(Number(document.getElementById('set-start-fund').value) || 0);
+
+      appData.settings.unitPrice = unitPrice;
+      appData.settings.promo3Price = promo3Price;
+      appData.settings.pocketPercent = pocketPercent;
+      appData.settings.startingFund = startingFund;
+
+      saveData();
+      closeModal();
+      renderAll();
+      showToast('Настройки обновлены', 'success');
+    }
+
+    function exportJsonBackup() {
+      try {
+        const json = JSON.stringify(appData, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `myasomix-backup-${todayStr()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Файл бэкапа сохранен!', 'success');
+      } catch (e) {
+        copyTextToClipboard(JSON.stringify(appData), 'JSON скопирован в буфер!');
+      }
+    }
+
+    function triggerJsonImport() {
+      const inp = document.getElementById('json-import-input');
+      inp.value = '';
+      inp.click();
+    }
+
+    function handleJsonImportFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed || !parsed.settings || !Array.isArray(parsed.sales) || !Array.isArray(parsed.purchases)) {
+            throw new Error('Неверный формат файла');
+          }
+          appData = parsed;
+          saveData();
+          closeModal();
+          renderAll();
+          showToast('Данные успешно восстановлены из бэкапа!', 'success');
+        } catch (err) {
+          showToast('Ошибка импорта: выберите корректный JSON файл МясоМикс CRM', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function promptStartFresh() {
+      openConfirmModal({
+        title: 'Начать с чистого листа?',
+        message: 'Все текущие (или демо) записи будут очищены, и вы сразу укажете, сколько банок сейчас лежит в вашей морозилке.',
+        confirmText: 'Очистить и начать',
+        danger: true,
+        onConfirm: () => {
+          appData = createEmptyState();
+          saveData();
+          renderAll();
+          openStockModal(true);
+        }
+      });
+    }
+
+    function confirmLoadDemo() {
+      openConfirmModal({
+        title: 'Загрузить демо-данные?',
+        message: 'Текущие данные будут заменены демонстрационным примером с клиентами, закупками и графиками.',
+        confirmText: 'Загрузить демо',
+        onConfirm: () => {
+          appData = createDemoState();
+          saveData();
+          renderAll();
+          showToast('Демо-данные загружены', 'info');
+        }
+      });
+    }
+
+    /* =========================================================================
+       ЗАПУСК ПРИЛОЖЕНИЯ
+       ========================================================================= */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
