@@ -693,6 +693,7 @@
       const lastBatchQty = dateEntries[dateEntries.length - 1][1];
       const lastSingleOrderQty = sales[sales.length - 1].qty;
 
+      const defaultDaysPerUnit = 1 / (appData.settings.defaultDailyRate || 1);
       let daysPerUnit;
       let isSmartRate = false;
 
@@ -701,19 +702,48 @@
         daysPerUnit = 1 / client.dailyRateOverride;
         isSmartRate = false;
       } else if (dateEntries.length >= 2) {
-        const spanDays = Math.max(1, diffDays(firstDate, lastDate));
-        const qtyExcludingLast = dateEntries
-          .slice(0, -1)
-          .reduce((sum, [, q]) => sum + q, 0);
-        daysPerUnit = qtyExcludingLast > 0 ? (spanDays / qtyExcludingLast) : 1;
-        // Адекватные границы темпа
+        // 1. Темп (дней на 1 банку) на каждом отдельном интервале между заказами
+        const intervals = [];
+        for (let i = 0; i < dateEntries.length - 1; i++) {
+          const gapDays = Math.max(1, diffDays(dateEntries[i][0], dateEntries[i + 1][0]));
+          const prevQty = Math.max(1, dateEntries[i][1]);
+          const obs = Math.max(0.15, Math.min(10, gapDays / prevQty));
+          intervals.push(obs);
+        }
+
+        // 2. Фильтр отпусков и выбросов: отсекаем аномальные паузы относительно медианы
+        let cleanIntervals = intervals;
+        if (intervals.length >= 3) {
+          const sorted = [...intervals].sort((a, b) => a - b);
+          const mid = Math.floor(sorted.length / 2);
+          const median = sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+          const filtered = intervals.filter(v => v <= median * 2.2 && v >= median * 0.35);
+          if (filtered.length > 0) cleanIntervals = filtered;
+        }
+
+        // 3. Экспоненциальное сглаживание (EWMA): свежие заказы весят больше старых
+        const alpha = 0.45;
+        let ewma = cleanIntervals[0];
+        for (let i = 1; i < cleanIntervals.length; i++) {
+          const val = cleanIntervals[i];
+          const ratio = val / ewma;
+          // Защита от внезапного отпуска на короткой истории — гасим резкий скачок
+          const stepAlpha = (ratio > 2.2 || ratio < 0.35) ? 0.12 : alpha;
+          ewma = stepAlpha * val + (1 - stepAlpha) * ewma;
+        }
+
+        // 4. Байесовский старт: мягко смешиваем базовую норму с реальной историей
+        const priorWeight = 0.35;
+        const n = cleanIntervals.length;
+        daysPerUnit = (ewma * n + defaultDaysPerUnit * priorWeight) / (n + priorWeight);
         daysPerUnit = Math.max(0.15, Math.min(10, daysPerUnit));
         isSmartRate = true;
       } else {
-        daysPerUnit = 1 / (appData.settings.defaultDailyRate || 1);
+        daysPerUnit = defaultDaysPerUnit;
         isSmartRate = false;
       }
-
       const cycleDays = Math.max(1, Math.round(lastBatchQty * daysPerUnit));
       const nextOrderDate = addDaysStr(lastDate, cycleDays);
       const today = todayStr();
